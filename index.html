@@ -41,7 +41,7 @@
 
 /* ---------- Reset ---------- */
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 body {
   background: var(--bg);
   color: var(--text);
@@ -459,12 +459,18 @@ footer { border-top: 1px solid var(--line); padding: 40px 0; text-align: center;
   .tl-item .tl-node { left: 12px !important; right: auto !important; }
   .tl-item:nth-child(odd) .tl-card li { padding-left: 18px; padding-right: 0; }
   .tl-item:nth-child(odd) .tl-card li::before { left: 0; right: auto; }
+  /* Off-canvas menu stays WITHIN the viewport (left+right anchored) and hides
+     via opacity/visibility — a fixed element translated off-screen would inflate
+     page width and trigger mobile zoom-out. */
   .nav-links {
-    position: fixed; top: 52px; right: 0; flex-direction: column;
-    background: rgba(10,14,20,.97); border: 1px solid var(--line); border-radius: 0 0 0 10px;
-    padding: 10px; transform: translateX(110%); transition: transform .3s; gap: 2px;
+    position: fixed; top: 54px; right: 8px; left: 8px; flex-direction: column;
+    background: rgba(10,14,20,.97); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px; gap: 2px;
+    opacity: 0; visibility: hidden; transform: translateY(-10px);
+    transition: opacity .25s ease, transform .25s ease, visibility .25s;
   }
-  .nav-links.open { transform: translateX(0); }
+  .nav-links.open { opacity: 1; visibility: visible; transform: translateY(0); }
+  .nav-links a { padding: 12px 14px; }
   .nav-toggle { display: block; }
 }
 @media (max-width: 520px) {
