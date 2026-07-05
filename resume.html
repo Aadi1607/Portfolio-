@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aaditya Chaudhari — Resume</title>
+<style>
+/* ATS-friendly: single column, standard fonts, real selectable text,
+   standard section headings, no images/tables around critical text. */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --ink: #1a1a1a;
+  --muted: #4a4a4a;
+  --accent: #0b6b5e;   /* professional teal — prints well, ATS ignores color */
+  --rule: #cfd6d3;
+}
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body {
+  font-family: "Calibri", "Segoe UI", Arial, sans-serif;
+  color: var(--ink);
+  font-size: 9.4pt;
+  line-height: 1.22;
+  background: #fff;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 22px 40px;
+}
+
+/* Header */
+header { text-align: center; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+h1 { font-size: 20pt; letter-spacing: .5px; color: var(--ink); font-weight: 700; }
+.role { font-size: 10.8pt; color: var(--accent); font-weight: 600; margin-top: 2px; letter-spacing: .3px; }
+.contact { font-size: 9.2pt; color: var(--muted); margin-top: 5px; }
+.contact a { color: var(--muted); text-decoration: none; }
+.contact span { white-space: nowrap; }
+.sep { color: var(--rule); margin: 0 6px; }
+
+/* Sections */
+section { margin-top: 6px; }
+h2 {
+  font-size: 10.2pt; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--accent); border-bottom: 1px solid var(--rule);
+  padding-bottom: 2px; margin-bottom: 5px; font-weight: 700;
+}
+
+/* Entry blocks */
+.entry { margin-bottom: 5px; }
+.entry:last-child { margin-bottom: 0; }
+.entry-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.entry-title { font-weight: 700; font-size: 10.8pt; }
+.entry-org { font-style: italic; color: var(--muted); font-size: 10pt; }
+.entry-date { color: var(--muted); font-size: 9.4pt; white-space: nowrap; font-weight: 600; }
+ul { list-style: none; margin-top: 3px; }
+li { position: relative; padding-left: 15px; margin: 2px 0; }
+li::before { content: "▪"; position: absolute; left: 2px; color: var(--accent); font-size: 8pt; top: 1px; }
+.summary { text-align: justify; }
+
+/* Skills — inline label + values, ATS-parseable text */
+.skill-row { margin: 3px 0; }
+.skill-label { font-weight: 700; }
+
+/* Two-line project meta */
+.proj-tech { color: var(--muted); font-size: 9.3pt; font-style: italic; margin-top: 1px; }
+
+/* Certs as compact list */
+.cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 24px; }
+.cert-item { padding-left: 15px; position: relative; margin: 2px 0; }
+.cert-item::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+.cert-item.pending::before { content: "◷"; color: var(--muted); }
+
+@media print {
+  body { padding: 8mm 14mm; max-width: none; }
+  section { break-inside: avoid; }
+  .entry { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>AADITYA CHAUDHARI</h1>
+  <div class="role">Cyber Security Professional &nbsp;|&nbsp; AI, Threat Intelligence &amp; Secure Systems</div>
+  <div class="contact">
+    <span>Pune / Nashik, Maharashtra, India</span><span class="sep">|</span>
+    <span>+91 90223 92590</span><span class="sep">|</span>
+    <span><a href="mailto:aadityachaudhari1602@gmail.com">aadityachaudhari1602@gmail.com</a></span><span class="sep">|</span>
+    <span><a href="https://www.linkedin.com/in/aaditya-chaudhari-20324a240">linkedin.com/in/aaditya-chaudhari</a></span>
+  </div>
+</header>
+
+<section>
+  <h2>Professional Summary</h2>
+  <p class="summary">
+    Cyber Security professional and M.Tech candidate specializing in threat intelligence, OSINT,
+    AI-driven security, and vulnerability assessment. Skilled in building agentic-AI and
+    computer-vision systems, scalable dark-web / OSINT intelligence pipelines, and real-time
+    threat-detection tools, with a strong foundation in network security, digital forensics, and
+    secure system design — backed by hands-on project delivery and industry certifications.
+  </p>
+</section>
+
+<section>
+  <h2>Education</h2>
+  <div class="entry">
+    <div class="entry-head">
+      <span><span class="entry-title">M.Tech in Cyber Security</span> — <span class="entry-org">Ratan Tata Maharashtra State Skills University (RTMSSU), Pune</span></span>
+      <span class="entry-date">2025 – 2027</span>
+    </div>
+    <ul>
+      <li><b>First Year CGPA: 8.66 / 10</b> (Pursuing). Coursework: Advanced Cyber Security, Network Security, Digital Forensics, Threat Intelligence, AI in Cybersecurity, Secure Systems.</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="entry-head">
+      <span><span class="entry-title">B.Tech in Cyber Security &amp; Forensics</span> — <span class="entry-org">Sandip University, Nashik</span></span>
+      <span class="entry-date">2021 – 2025</span>
+    </div>
+    <ul>
+      <li><b>CGPA: 8.50 / 10.</b> Coursework: Ethical Hacking, Digital Forensics, Network Security, Cryptography, Malware Analysis, Web Application Security, Incident Response, Secure Software Development.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Experience</h2>
+  <div class="entry">
+    <div class="entry-head">
+      <span><span class="entry-title">Cyber Security Project — Confidential Client Engagement</span> — <span class="entry-org">RTMSSU, Pune</span></span>
+      <span class="entry-date">2025 – Present</span>
+    </div>
+    <ul>
+      <li>Developing an Agentic AI dark-web &amp; OSINT intelligence platform for a confidential client engagement assigned to the university.</li>
+      <li>Designed scalable crawling, document processing, and semantic-search pipelines with local LLMs for entity extraction and intelligent retrieval on distributed infrastructure.</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="entry-head">
+      <span><span class="entry-title">Cyber Security Intern</span> — <span class="entry-org">YHills (Online Internship)</span></span>
+      <span class="entry-date">2023 · 3 Months</span>
+    </div>
+    <ul>
+      <li>Completed hands-on training in vulnerability assessment during B.Tech (3rd year).</li>
+      <li>Learned to identify, analyze, and report security weaknesses across systems and applications.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Key Projects</h2>
+  <div class="entry">
+    <div class="entry-head">
+      <span class="entry-title">Agentic AI Dark Web Intelligence Platform</span>
+      <span class="entry-date">Confidential</span>
+    </div>
+    <div class="proj-tech">Python, Playwright, Docker, PostgreSQL, Redis, Linux, Ollama (Local LLMs)</div>
+    <ul>
+      <li>End-to-end AI platform automating intelligence collection and analysis from dark-web and open sources — scalable crawling, semantic search, local-LLM entity extraction, and distributed processing for high throughput.</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="entry-head">
+      <span class="entry-title">AI-Powered Surveillance &amp; Face Recognition System (FRS)</span>
+    </div>
+    <div class="proj-tech">Python, OpenCV, InsightFace (ArcFace), Deep Learning</div>
+    <ul>
+      <li>Real-time surveillance system pairing high-accuracy facial recognition with intelligent visual analytics — face detection, person recognition &amp; matching, and event-based scene understanding, optimized for accuracy and speed.</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="entry-head">
+      <span class="entry-title">OSINT Web Crawler</span>
+    </div>
+    <div class="proj-tech">Python, Playwright, Docker, PostgreSQL, Redis, Linux</div>
+    <ul>
+      <li>Automated OSINT crawler collecting and structuring publicly available information at scale — intelligent content extraction, automated indexing, and information-retrieval workflows.</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="entry-head">
+      <span class="entry-title">Real-Time Malware Detection Browser Extension</span>
+    </div>
+    <div class="proj-tech">JavaScript, HTML, CSS, Chrome Extensions (Manifest V3), VirusTotal API</div>
+    <ul>
+      <li>Chrome extension (Manifest V3) for real-time malware detection of files and URLs via VirusTotal — drag-and-drop scanning, detailed reports, and downloadable PDF security summaries.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Technical Skills</h2>
+  <div class="skill-row"><span class="skill-label">Security:</span> Cyber Security, Threat Intelligence, OSINT, Vulnerability Assessment, Network Security, Digital Forensics, Malware Analysis, Ethical Hacking, Incident Response, Cryptography</div>
+  <div class="skill-row"><span class="skill-label">AI / ML:</span> Local LLMs (Ollama), RAG &amp; Semantic Search, Computer Vision (OpenCV, InsightFace / ArcFace), Deep Learning</div>
+  <div class="skill-row"><span class="skill-label">Languages:</span> Python, Java, JavaScript, Bash</div>
+  <div class="skill-row"><span class="skill-label">Tools &amp; Infra:</span> Docker, PostgreSQL, Redis, Linux, Playwright, VirusTotal API, Git</div>
+  <div class="skill-row"><span class="skill-label">Frameworks:</span> MITRE ATT&amp;CK &amp; ATLAS</div>
+</section>
+
+<section>
+  <h2>Certifications</h2>
+  <div class="cert-grid">
+    <div class="cert-item">Google Cybersecurity Professional Certificate — Coursera</div>
+    <div class="cert-item">Cisco Cybersecurity Certification</div>
+    <div class="cert-item">MITRE ATT&amp;CK &amp; ATLAS Framework Proficiency</div>
+    <div class="cert-item">Full-Stack Java Development Certificate</div>
+    <div class="cert-item pending">CEH — Training complete, certification pending</div>
+    <div class="cert-item pending">CCNA — Training complete, certification pending</div>
+  </div>
+</section>
+
+</body>
+</html>
