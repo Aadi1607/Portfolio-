@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Cybersecurity Master's student portfolio — penetration testing, threat detection, and digital forensics." />
+<meta name="author" content="[YOUR NAME]" />
+<title>[YOUR NAME] — Cybersecurity Portfolio</title>
+
+<!-- ============================================================
+     FONTS — JetBrains Mono (mono/headings/terminal) + Inter (body)
+     ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+/* ================================================================
+   PORTFOLIO STYLESHEET
+   All tweakable colors/timings live in :root and the JS CONFIG obj.
+   ================================================================ */
+
+:root {
+  /* --- Core palette --- */
+  --bg:            #0a0e14;   /* near-black base */
+  --bg-2:          #0d1220;   /* slightly lifted panels */
+  --bg-3:          #111827;   /* cards */
+  --matrix:        #00ff41;   /* matrix green */
+  --cyan:          #00d4ff;   /* cyber cyan */
+  --alert:         #ff3e3e;   /* alert red */
+  --text:          #c9d4e3;   /* readable body */
+  --text-dim:      #6b7a90;   /* muted */
+  --line:          rgba(0, 212, 255, 0.15);
+  --mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* --- Effects --- */
+  --glow-green: 0 0 8px rgba(0,255,65,.6), 0 0 20px rgba(0,255,65,.25);
+  --glow-cyan:  0 0 8px rgba(0,212,255,.6), 0 0 20px rgba(0,212,255,.25);
+}
+
+/* ---------- Reset ---------- */
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.6;
+  overflow-x: hidden;
+  cursor: none; /* replaced by reticle; restored on touch/reduced-motion */
+}
+h1,h2,h3,h4 { font-family: var(--mono); font-weight: 700; line-height: 1.15; letter-spacing: -.01em; }
+a { color: var(--cyan); text-decoration: none; }
+img { max-width: 100%; display: block; }
+section { position: relative; }
+
+/* Selection */
+::selection { background: rgba(0,255,65,.25); color: #fff; }
+
+/* Focus states — green outline glow */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--matrix);
+  outline-offset: 3px;
+  box-shadow: var(--glow-green);
+  border-radius: 3px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #1c2740; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #26344f; }
+
+/* ================================================================
+   FIXED / GLOBAL LAYERS
+   ================================================================ */
+
+/* Persistent network-topology particle canvas */
+#network-canvas {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none; opacity: .55;
+}
+
+/* Scanline / CRT overlay */
+.crt-overlay {
+  position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 0px,
+    rgba(0,0,0,0) 2px,
+    rgba(0,0,0,.06) 3px,
+    rgba(0,0,0,0) 4px
+  );
+  mix-blend-mode: overlay;
+}
+.crt-overlay::after {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,.35) 100%);
+}
+
+/* Custom cursor — reticle + trailing dot */
+.cursor-reticle, .cursor-dot {
+  position: fixed; top: 0; left: 0; z-index: 9999;
+  pointer-events: none; transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+}
+.cursor-reticle {
+  width: 34px; height: 34px;
+  border: 1px solid var(--matrix);
+  border-radius: 50%;
+  transition: width .18s ease, height .18s ease, border-color .18s ease;
+}
+.cursor-reticle::before, .cursor-reticle::after {
+  content:''; position:absolute; background: var(--matrix);
+}
+.cursor-reticle::before { top:50%; left:-6px; right:-6px; height:1px; transform:translateY(-50%); }
+.cursor-reticle::after  { left:50%; top:-6px; bottom:-6px; width:1px; transform:translateX(-50%); }
+.cursor-dot { width: 5px; height: 5px; background: var(--cyan); border-radius: 50%; }
+.cursor-reticle.hovering { width: 50px; height: 50px; border-color: var(--cyan); }
+
+/* Scroll progress "upload bar" */
+#scan-bar-wrap {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 70;
+  height: 3px; background: rgba(255,255,255,.05);
+}
+#scan-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--matrix), var(--cyan));
+  box-shadow: var(--glow-green);
+}
+#scan-readout {
+  position: fixed; top: 8px; right: 14px; z-index: 70;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .08em;
+  color: var(--matrix); text-shadow: var(--glow-green);
+  opacity: .85;
+}
+
+/* ================================================================
+   PRELOADER — boot sequence + blast doors
+   ================================================================ */
+#preloader { position: fixed; inset: 0; z-index: 1000; background: #000; }
+.boot-terminal {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: min(90vw, 640px); font-family: var(--mono); font-size: 14px;
+  color: var(--matrix);
+}
+.boot-line { white-space: pre-wrap; opacity: 0; }
+.boot-line .ok { color: var(--matrix); text-shadow: var(--glow-green); }
+.boot-line .warn { color: var(--cyan); }
+.boot-cursor { display:inline-block; width:9px; height:16px; background:var(--matrix);
+  vertical-align:middle; animation: blink 1s steps(2) infinite; }
+.boot-skip {
+  position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+  font-family: var(--mono); font-size: 11px; color: var(--text-dim);
+  letter-spacing: .1em;
+}
+/* Blast doors */
+.blast-door {
+  position: absolute; left: 0; width: 100%; height: 50%;
+  background: linear-gradient(var(--bg), #05070b);
+  z-index: 1001;
+}
+.blast-door.top { top: 0; border-bottom: 2px solid var(--matrix); box-shadow: 0 4px 30px rgba(0,255,65,.3); }
+.blast-door.bottom { bottom: 0; border-top: 2px solid var(--matrix); box-shadow: 0 -4px 30px rgba(0,255,65,.3); }
+.green-flash {
+  position: absolute; inset: 0; z-index: 1002; background: var(--matrix);
+  opacity: 0; pointer-events: none;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ================================================================
+   NAV — command bar (appears after hero)
+   ================================================================ */
+#navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 80;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px clamp(16px, 4vw, 48px);
+  background: rgba(10,14,20,.72);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+  transform: translateY(-110%);
+  transition: transform .4s cubic-bezier(.2,.8,.2,1);
+}
+#navbar.visible { transform: translateY(0); }
+.nav-brand { font-family: var(--mono); font-weight: 800; color: var(--matrix); font-size: 15px; }
+.nav-brand .caret { color: var(--cyan); }
+.nav-links { display: flex; gap: 4px; list-style: none; flex-wrap: wrap; }
+.nav-links a {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .05em;
+  color: var(--text-dim); padding: 6px 10px; border-radius: 4px;
+  transition: color .2s, background .2s;
+}
+.nav-links a:hover { color: var(--cyan); }
+.nav-links a.active { color: var(--matrix); background: rgba(0,255,65,.08); text-shadow: var(--glow-green); }
+.nav-toggle { display: none; background: none; border: 1px solid var(--line);
+  color: var(--matrix); font-family: var(--mono); padding: 6px 10px; border-radius: 4px; cursor: none; }
+
+/* ================================================================
+   LAYOUT PRIMITIVES
+   ================================================================ */
+.wrap { position: relative; z-index: 2; max-width: 1160px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 40px); }
+.section-pad { padding: clamp(80px, 12vh, 150px) 0; }
+
+.section-label {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .25em;
+  text-transform: uppercase; color: var(--cyan); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::before { content:''; width: 26px; height: 1px; background: var(--cyan); }
+.section-title { font-size: clamp(28px, 5vw, 48px); margin-bottom: 14px; color: #fff; }
+.section-title .accent { color: var(--matrix); }
+.section-intro { max-width: 620px; color: var(--text-dim); margin-bottom: 48px; }
+
+/* Decrypt/scramble helper adds monospace so widths stay stable while shuffling */
+[data-decrypt] { font-family: var(--mono); }
+
+/* ================================================================
+   HERO
+   ================================================================ */
+#hero { min-height: 100vh; display: flex; align-items: center; overflow: hidden; }
+#matrix-canvas {
+  position: absolute; inset: 0; z-index: 1; opacity: .35;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, #000 45%, transparent 85%);
+          mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, #000 45%, transparent 85%);
+}
+.hero-inner { position: relative; z-index: 3; }
+.hero-status {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 12px; letter-spacing: .12em;
+  color: var(--matrix); border: 1px solid rgba(0,255,65,.3);
+  padding: 6px 14px; border-radius: 40px; margin-bottom: 24px;
+  background: rgba(0,255,65,.05);
+}
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--matrix);
+  box-shadow: var(--glow-green); animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.4; transform:scale(.7)} }
+.hero-name { font-size: clamp(40px, 9vw, 104px); color: #fff; letter-spacing: -.02em; }
+.hero-name .type-cursor { color: var(--matrix); font-weight: 400; }
+.hero-sub { font-family: var(--mono); font-size: clamp(15px, 2.6vw, 26px); color: var(--cyan);
+  margin-top: 10px; min-height: 1.3em; text-shadow: var(--glow-cyan); }
+.hero-tagline { max-width: 560px; margin-top: 22px; color: var(--text-dim); font-size: 17px; }
+.hero-cta { display: flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
+.btn {
+  font-family: var(--mono); font-size: 13px; letter-spacing: .05em;
+  padding: 13px 24px; border-radius: 6px; cursor: none;
+  border: 1px solid var(--matrix); color: var(--matrix); background: transparent;
+  transition: background .2s, box-shadow .2s, color .2s; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn:hover { background: rgba(0,255,65,.12); box-shadow: var(--glow-green); }
+.btn.cyan { border-color: var(--cyan); color: var(--cyan); }
+.btn.cyan:hover { background: rgba(0,212,255,.12); box-shadow: var(--glow-cyan); }
+.hero-prompt {
+  position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%);
+  z-index: 3; font-family: var(--mono); font-size: 14px; color: var(--text-dim);
+  display: flex; align-items: center; gap: 10px; white-space: nowrap;
+}
+.hero-prompt .path { color: var(--matrix); }
+.chevron { display: inline-block; color: var(--cyan); animation: bounce 1.6s infinite; font-size: 18px; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+
+/* ================================================================
+   TERMINAL WINDOW (About + Contact reuse)
+   ================================================================ */
+.terminal {
+  background: rgba(13,18,32,.9); border: 1px solid var(--line);
+  border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+.term-bar {
+  display: flex; align-items: center; gap: 8px; padding: 11px 14px;
+  background: #0b1120; border-bottom: 1px solid var(--line);
+}
+.term-btn { width: 12px; height: 12px; border-radius: 50%; }
+.term-btn.r { background: var(--alert); }
+.term-btn.y { background: var(--cyan); }
+.term-btn.g { background: var(--matrix); }
+.term-title { margin-left: 10px; font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+.term-body { padding: 22px; font-family: var(--mono); font-size: 14px; min-height: 220px; }
+.term-line { margin: 4px 0; }
+.term-cmd { color: var(--matrix); }
+.term-cmd .p { color: var(--cyan); }
+.term-out { color: var(--text); padding-left: 2px; }
+.term-out.dim { color: var(--text-dim); }
+
+/* About layout */
+.about-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 40px; align-items: start; }
+.scan-frame { position: relative; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; aspect-ratio: 3/4; }
+.scan-frame img { width: 100%; height: 100%; object-fit: cover; filter: blur(14px) grayscale(1); transition: filter 1.4s ease; }
+.scan-frame.revealed img { filter: blur(0) grayscale(0); }
+.scan-line {
+  position: absolute; left: 0; right: 0; height: 3px; top: 0;
+  background: linear-gradient(90deg, transparent, var(--matrix), transparent);
+  box-shadow: var(--glow-green); opacity: 0;
+}
+.scan-frame .frame-meta {
+  position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 12px;
+  font-family: var(--mono); font-size: 11px; color: var(--matrix);
+  background: linear-gradient(transparent, rgba(0,0,0,.85)); letter-spacing: .05em;
+}
+
+/* ================================================================
+   SKILLS
+   ================================================================ */
+.skill-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); gap: 18px; margin-bottom: 60px; perspective: 1200px; }
+.skill-card {
+  background: var(--bg-3); border: 1px solid var(--line); border-radius: 10px;
+  padding: 24px; transform-style: preserve-3d;
+}
+.skill-card .icon { font-size: 26px; margin-bottom: 12px; filter: drop-shadow(0 0 6px rgba(0,255,65,.5)); }
+.skill-card h3 { font-size: 16px; color: #fff; margin-bottom: 8px; }
+.skill-card p { font-size: 13px; color: var(--text-dim); font-family: var(--sans); }
+.skill-card .tags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--mono); font-size: 11px; color: var(--cyan);
+  border: 1px solid rgba(0,212,255,.25); padding: 3px 8px; border-radius: 20px; }
+
+.bars { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 22px 40px; }
+.bar-row .bar-head { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 13px; margin-bottom: 7px; }
+.bar-row .bar-name { color: var(--text); }
+.bar-row .bar-pct { color: var(--matrix); }
+.bar-track { height: 8px; background: #0b1120; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.bar-fill { height: 100%; width: 0%; border-radius: 6px;
+  background: linear-gradient(90deg, var(--matrix), var(--cyan)); }
+.bar-fill.done { box-shadow: var(--glow-green); }
+
+/* ================================================================
+   PROJECTS — case files
+   ================================================================ */
+.cases { display: flex; flex-direction: column; gap: 34px; }
+.case {
+  position: relative; background: var(--bg-3); border: 1px solid var(--line);
+  border-radius: 12px; overflow: hidden; transition: transform .3s, box-shadow .3s, border-color .3s;
+}
+.case:hover { transform: translateY(-6px); border-color: var(--cyan); box-shadow: var(--glow-cyan); }
+.case-strip {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 18px; background: #0b1120; border-bottom: 1px solid var(--line);
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em;
+}
+.case-id { color: var(--cyan); }
+.case-status { color: var(--matrix); display: flex; align-items: center; gap: 6px; }
+.case-status .sd { width: 7px; height: 7px; border-radius: 50%; background: var(--matrix); box-shadow: var(--glow-green); }
+.case-status.active { color: var(--alert); }
+.case-status.active .sd { background: var(--alert); box-shadow: 0 0 8px rgba(255,62,62,.7); }
+.case-body { padding: 22px; }
+.case-body h3 { font-size: 20px; color: #fff; margin-bottom: 10px; }
+.case-body p { font-size: 14.5px; color: var(--text-dim); margin-bottom: 16px; }
+.case-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
+.case-links { display: flex; gap: 16px; font-family: var(--mono); font-size: 13px; }
+.case-links a { display: inline-flex; align-items: center; gap: 6px; }
+/* redacted censor bars */
+.redact { position: relative; background: #000; color: transparent; border-radius: 2px; padding: 0 3px; }
+.redact.revealed { background: transparent; color: inherit; transition: color .1s; }
+/* static/noise flicker on hover */
+.case-noise { position: absolute; inset: 0; pointer-events: none; opacity: 0; z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"); }
+.case:hover .case-noise { animation: noiseflick .4s steps(3) 1; }
+@keyframes noiseflick { 0%{opacity:0} 30%{opacity:.08} 60%{opacity:.03} 100%{opacity:0} }
+
+/* ================================================================
+   TIMELINE
+   ================================================================ */
+.timeline { position: relative; padding: 20px 0; }
+.tl-spine {
+  position: absolute; left: 50%; top: 0; width: 2px; height: 100%;
+  background: rgba(0,212,255,.12); transform: translateX(-50%);
+}
+.tl-progress {
+  position: absolute; left: 50%; top: 0; width: 2px; height: 0%;
+  background: linear-gradient(var(--matrix), var(--cyan));
+  box-shadow: var(--glow-cyan); transform: translateX(-50%); transform-origin: top;
+}
+.tl-item { position: relative; width: 50%; padding: 22px 46px; }
+.tl-item:nth-child(odd) { left: 0; text-align: right; }
+.tl-item:nth-child(even) { left: 50%; }
+.tl-node {
+  position: absolute; top: 30px; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--text-dim); z-index: 2;
+  transition: all .4s ease;
+}
+.tl-item:nth-child(odd) .tl-node { right: -8px; }
+.tl-item:nth-child(even) .tl-node { left: -8px; }
+.tl-node.live { border-color: var(--matrix); background: var(--matrix); box-shadow: var(--glow-green); }
+.tl-card { background: var(--bg-3); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+.tl-date { font-family: var(--mono); font-size: 12px; color: var(--cyan); letter-spacing: .06em; }
+.tl-role { font-size: 18px; color: #fff; margin: 6px 0 2px; }
+.tl-org { font-family: var(--mono); font-size: 13px; color: var(--matrix); margin-bottom: 10px; }
+.tl-card ul { list-style: none; }
+.tl-card li { font-size: 14px; color: var(--text-dim); position: relative; padding-left: 18px; margin: 5px 0; }
+.tl-card li::before { content:'▹'; position: absolute; left: 0; color: var(--cyan); }
+.tl-item:nth-child(odd) .tl-card li { padding-left: 0; padding-right: 18px; }
+.tl-item:nth-child(odd) .tl-card li::before { left: auto; right: 0; }
+
+/* ================================================================
+   CERTIFICATIONS + STATS
+   ================================================================ */
+.badges { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 18px; margin-bottom: 60px; }
+.badge {
+  position: relative; background: var(--bg-3); border: 1px solid var(--line);
+  border-radius: 12px; padding: 26px 20px; text-align: center; overflow: hidden;
+}
+.badge .b-icon { font-size: 34px; margin-bottom: 12px; }
+.badge h3 { font-size: 15px; color: #fff; margin-bottom: 4px; }
+.badge p { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+.verified-stamp {
+  position: absolute; top: 14px; right: 12px; font-family: var(--mono);
+  font-size: 11px; font-weight: 700; color: var(--matrix);
+  border: 2px solid var(--matrix); border-radius: 5px; padding: 3px 7px;
+  transform: rotate(-14deg) scale(2.4); opacity: 0; text-shadow: var(--glow-green);
+  box-shadow: var(--glow-green); letter-spacing: .05em;
+}
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 20px; }
+.stat { text-align: center; padding: 26px; border: 1px solid var(--line); border-radius: 12px; background: rgba(13,18,32,.5); }
+.stat .num { font-family: var(--mono); font-size: clamp(34px,6vw,52px); font-weight: 800; color: var(--matrix); text-shadow: var(--glow-green); }
+.stat .num .suffix { color: var(--cyan); }
+.stat .lbl { font-size: 13px; color: var(--text-dim); margin-top: 6px; }
+
+/* ================================================================
+   CONTACT + FOOTER
+   ================================================================ */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+.contact-intro p { color: var(--text-dim); margin-bottom: 18px; }
+.contact-meta { font-family: var(--mono); font-size: 14px; }
+.contact-meta div { margin: 10px 0; display: flex; gap: 10px; }
+.contact-meta .k { color: var(--cyan); }
+.contact-meta .v a { color: var(--text); }
+.form-field { margin-bottom: 18px; }
+.form-field label { display: block; font-family: var(--mono); font-size: 13px; color: var(--matrix); margin-bottom: 7px; }
+.form-field input, .form-field textarea {
+  width: 100%; background: #0b1120; border: 1px solid var(--line); border-radius: 6px;
+  color: var(--text); font-family: var(--mono); font-size: 14px; padding: 12px 14px; resize: vertical;
+}
+.form-field input:focus, .form-field textarea:focus { border-color: var(--matrix); }
+.transmit-btn { width: 100%; font-size: 14px; justify-content: center; }
+.form-status { font-family: var(--mono); font-size: 13px; color: var(--matrix); margin-top: 14px; min-height: 20px; text-shadow: var(--glow-green); }
+
+footer { border-top: 1px solid var(--line); padding: 40px 0; text-align: center; position: relative; z-index: 2; }
+.social { display: flex; justify-content: center; gap: 22px; margin-bottom: 20px; }
+.social a { font-size: 22px; color: var(--text-dim); transition: color .2s, text-shadow .2s, transform .2s; }
+.social a:hover { color: var(--matrix); text-shadow: var(--glow-green); transform: translateY(-3px); }
+.footer-note { font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+.footer-note .accent { color: var(--matrix); }
+
+/* Easter egg flash */
+#egg-flash {
+  position: fixed; inset: 0; z-index: 2000; background: var(--matrix);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: clamp(30px,8vw,90px); font-weight: 800;
+  color: #000; opacity: 0; pointer-events: none; letter-spacing: .1em;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 860px) {
+  .about-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .tl-spine, .tl-progress { left: 20px; }
+  .tl-item { width: 100%; left: 0 !important; text-align: left !important; padding: 18px 0 18px 52px; }
+  .tl-item .tl-node { left: 12px !important; right: auto !important; }
+  .tl-item:nth-child(odd) .tl-card li { padding-left: 18px; padding-right: 0; }
+  .tl-item:nth-child(odd) .tl-card li::before { left: 0; right: auto; }
+  .nav-links {
+    position: fixed; top: 52px; right: 0; flex-direction: column;
+    background: rgba(10,14,20,.97); border: 1px solid var(--line); border-radius: 0 0 0 10px;
+    padding: 10px; transform: translateX(110%); transition: transform .3s; gap: 2px;
+  }
+  .nav-links.open { transform: translateX(0); }
+  .nav-toggle { display: block; }
+}
+@media (max-width: 520px) {
+  .hero-cta { flex-direction: column; }
+  .hero-prompt { font-size: 12px; }
+}
+
+/* ================================================================
+   REDUCED MOTION — simple fades, no heavy effects
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  body { cursor: auto !important; }
+  .cursor-reticle, .cursor-dot, #network-canvas, #matrix-canvas, .crt-overlay { display: none !important; }
+  * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ GLOBAL LAYERS ============ -->
+<canvas id="network-canvas" aria-hidden="true"></canvas>
+<div class="crt-overlay" aria-hidden="true"></div>
+<div class="cursor-reticle" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+
+<div id="scan-bar-wrap" aria-hidden="true"><div id="scan-bar"></div></div>
+<div id="scan-readout" aria-hidden="true">SYSTEM SCAN: 0%</div>
+
+<div id="egg-flash" aria-hidden="true">ACCESS GRANTED</div>
+
+<!-- ============ PRELOADER ============ -->
+<div id="preloader">
+  <div class="boot-terminal" id="boot-terminal" role="status" aria-label="System boot sequence"></div>
+  <div class="boot-skip">[ click anywhere to skip ]</div>
+  <div class="blast-door top"></div>
+  <div class="blast-door bottom"></div>
+  <div class="green-flash"></div>
+</div>
+
+<!-- ============ NAV ============ -->
+<nav id="navbar" aria-label="Primary">
+  <div class="nav-brand"><span class="caret">&gt;</span> [YOUR_NAME]<span class="caret">_</span></div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links">MENU</button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#hero">./home</a></li>
+    <li><a href="#about">./whoami</a></li>
+    <li><a href="#skills">./skills</a></li>
+    <li><a href="#projects">./case-files</a></li>
+    <li><a href="#timeline">./timeline</a></li>
+    <li><a href="#certs">./credentials</a></li>
+    <li><a href="#contact">./connect</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+  <canvas id="matrix-canvas" aria-hidden="true"></canvas>
+  <div class="wrap hero-inner">
+    <div class="hero-status"><span class="status-dot"></span> SECURE SESSION ESTABLISHED</div>
+    <h1 class="hero-name" id="hero-name"><span class="type-cursor">█</span></h1>
+    <p class="hero-sub" data-decrypt="Master's Student in Cybersecurity">Master's Student in Cybersecurity</p>
+    <p class="hero-tagline">
+      I break systems to understand how to defend them — specializing in
+      <span style="color:var(--matrix)">penetration testing</span>,
+      <span style="color:var(--cyan)">threat detection</span>, and
+      <span style="color:var(--matrix)">digital forensics</span>.
+      <em style="color:var(--text-dim)">[Swap this tagline in the CONFIG block.]</em>
+    </p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn" data-hover>▶ VIEW CASE FILES</a>
+      <a href="#contact" class="btn cyan" data-hover>⚿ ESTABLISH CONNECTION</a>
+    </div>
+  </div>
+  <div class="hero-prompt">
+    <span class="path">user@portfolio:~$</span> scroll --down
+    <span class="chevron">▼</span>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about" class="section-pad">
+  <div class="wrap">
+    <div class="section-label">01 // Identity</div>
+    <h2 class="section-title" data-decrypt="$ whoami"><span class="accent">$</span> whoami</h2>
+    <div class="about-grid">
+      <div class="terminal" data-glitch>
+        <div class="term-bar">
+          <span class="term-btn r"></span><span class="term-btn y"></span><span class="term-btn g"></span>
+          <span class="term-title">bash — ~/about</span>
+        </div>
+        <div class="term-body" id="about-terminal" aria-label="About bio terminal"></div>
+      </div>
+      <div>
+        <div class="scan-frame" id="scan-frame">
+          <!-- TODO: replace with your photo -->
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400'%3E%3Crect width='100%25' height='100%25' fill='%230d1220'/%3E%3Ctext x='50%25' y='50%25' fill='%2300ff41' font-family='monospace' font-size='16' text-anchor='middle'%3E[ PROFILE.IMG ]%3C/text%3E%3C/svg%3E" alt="Portrait of [YOUR NAME]" />
+          <div class="scan-line" id="scan-line"></div>
+          <div class="frame-meta">SUBJECT ID: 0x4A / CLEARANCE: GRANTED</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SKILLS ============ -->
+<section id="skills" class="section-pad">
+  <div class="wrap">
+    <div class="section-label">02 // Capability</div>
+    <h2 class="section-title" data-decrypt="Threat Capability Matrix">Threat Capability Matrix</h2>
+    <p class="section-intro">Hover any node to inspect. Proficiency bars calibrate on entry.</p>
+
+    <div class="skill-cards" id="skill-cards"><!-- injected --></div>
+    <div class="bars" id="skill-bars"><!-- injected --></div>
+  </div>
+</section>
+
+<!-- ============ PROJECTS ============ -->
+<section id="projects" class="section-pad">
+  <div class="wrap">
+    <div class="section-label">03 // Field Operations</div>
+    <h2 class="section-title" data-decrypt="Case Files">Case Files</h2>
+    <p class="section-intro">Selected engagements and research. Classified details declassify on inspection.</p>
+    <div class="cases" id="cases"><!-- injected --></div>
+  </div>
+</section>
+
+<!-- ============ TIMELINE ============ -->
+<section id="timeline" class="section-pad">
+  <div class="wrap">
+    <div class="section-label">04 // Recon History</div>
+    <h2 class="section-title" data-decrypt="Attack Timeline">Attack Timeline</h2>
+    <p class="section-intro">Experience &amp; education, mapped as a kill-chain. The line draws as you descend.</p>
+    <div class="timeline" id="timeline-el">
+      <div class="tl-spine"></div>
+      <div class="tl-progress" id="tl-progress"></div>
+      <!-- items injected -->
+    </div>
+  </div>
+</section>
+
+<!-- ============ CERTIFICATIONS ============ -->
+<section id="certs" class="section-pad">
+  <div class="wrap">
+    <div class="section-label">05 // Verification</div>
+    <h2 class="section-title" data-decrypt="Credentials Verified">Credentials Verified</h2>
+    <p class="section-intro">Hash checks passing. Each credential stamped on validation.</p>
+    <div class="badges" id="badges"><!-- injected --></div>
+    <div class="stats-row" id="stats"><!-- injected --></div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact" class="section-pad">
+  <div class="wrap">
+    <div class="section-label">06 // Handshake</div>
+    <h2 class="section-title" data-decrypt="Establish Secure Connection">Establish Secure Connection</h2>
+    <div class="contact-grid">
+      <div class="contact-intro">
+        <p>Open an encrypted channel. Whether it's a research collaboration, an internship,
+           or a CTF team recruit — transmissions are welcome.</p>
+        <div class="contact-meta">
+          <div><span class="k">&gt; email:</span> <span class="v"><a href="mailto:[EMAIL]">[EMAIL]</a></span></div>
+          <div><span class="k">&gt; linkedin:</span> <span class="v"><a href="[LINKEDIN URL]" target="_blank" rel="noopener">[LINKEDIN URL]</a></span></div>
+          <div><span class="k">&gt; github:</span> <span class="v"><a href="[GITHUB URL]" target="_blank" rel="noopener">[GITHUB URL]</a></span></div>
+          <div><span class="k">&gt; thm/htb:</span> <span class="v"><a href="[TRYHACKME/HACKTHEBOX PROFILE]" target="_blank" rel="noopener">[THM/HTB PROFILE]</a></span></div>
+        </div>
+      </div>
+      <div class="terminal">
+        <div class="term-bar">
+          <span class="term-btn r"></span><span class="term-btn y"></span><span class="term-btn g"></span>
+          <span class="term-title">secure-channel — encrypted</span>
+        </div>
+        <div class="term-body">
+          <form id="contact-form" novalidate>
+            <div class="form-field">
+              <label for="cf-name">&gt; enter_name:</label>
+              <input type="text" id="cf-name" name="name" required autocomplete="name" />
+            </div>
+            <div class="form-field">
+              <label for="cf-email">&gt; enter_email:</label>
+              <input type="email" id="cf-email" name="email" required autocomplete="email" />
+            </div>
+            <div class="form-field">
+              <label for="cf-msg">&gt; enter_message:</label>
+              <textarea id="cf-msg" name="message" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn transmit-btn" data-hover>⚿ TRANSMIT [ENCRYPTED]</button>
+            <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="social">
+      <a href="[GITHUB URL]" target="_blank" rel="noopener" aria-label="GitHub" data-hover>⌨</a>
+      <a href="[LINKEDIN URL]" target="_blank" rel="noopener" aria-label="LinkedIn" data-hover>in</a>
+      <a href="mailto:[EMAIL]" aria-label="Email" data-hover>✉</a>
+      <a href="[TRYHACKME/HACKTHEBOX PROFILE]" target="_blank" rel="noopener" aria-label="TryHackMe / HackTheBox" data-hover>⚑</a>
+    </div>
+    <p class="footer-note">© 2026 <span class="accent">[YOUR NAME]</span> — secured with 256-bit determination.
+       <br />Type <span class="accent">"sudo"</span> anywhere for root. </p>
+  </div>
+</footer>
+
+<!-- ============ LIBS ============ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+/* ================================================================
+   CONFIG — tweak everything here
+   ================================================================ */
+const CONFIG = {
+  // --- Identity (edit these) ---
+  name: "ALEX MERCER",                 // TODO: your name
+  subtitle: "Master's Student in Cybersecurity",
+  university: "[UNIVERSITY NAME]",
+
+  // --- Visual ---
+  colors: { matrix: "#00ff41", cyan: "#00d4ff", alert: "#ff3e3e" },
+
+  // --- Effect intensity ---
+  particles: 52,          // network nodes (keep < 60)
+  particleLinkDist: 150,  // px distance to draw a connecting line
+  matrixFontSize: 15,     // matrix rain glyph size
+  typeSpeed: 90,          // hero name typing (ms/char)
+  decryptSpeed: 34,       // scramble frame interval (ms)
+  decryptReveal: 2.4,     // chars revealed per scramble frame
+  bootLineDelay: 210,     // ms between boot lines
+};
+
+// Detect environment
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const TOUCH   = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+const SMALL   = window.matchMedia("(max-width: 860px)").matches;
+// Resilience: if the GSAP CDN fails to load, fall back to a static, no-scroll-anim
+// version so the site never gets stuck on the preloader / hidden content.
+const GSAP_OK = typeof window.gsap !== "undefined" && typeof window.ScrollTrigger !== "undefined";
+
+/* ================================================================
+   REUSABLE EFFECT 1 — DECRYPT / SCRAMBLE TEXT
+   Applied to any [data-decrypt] element when it enters the viewport.
+   ================================================================ */
+const GLYPHS = "!<>-_\\/[]{}—=+*^?#01$%ABCDEF0123456789".split("");
+function decryptText(el, finalText, speed = CONFIG.decryptSpeed) {
+  if (REDUCED) { el.textContent = finalText; return; }
+  let frame = 0;
+  const total = finalText.length;
+  clearInterval(el._decInt);
+  el._decInt = setInterval(() => {
+    let out = "";
+    const revealed = Math.floor(frame / 1);
+    for (let i = 0; i < total; i++) {
+      if (finalText[i] === " ") { out += " "; continue; }
+      if (i < revealed * CONFIG.decryptReveal) out += finalText[i];
+      else out += GLYPHS[Math.floor((i * 7 + frame * 13) % GLYPHS.length)];
+    }
+    el.textContent = out;
+    frame++;
+    if (revealed * CONFIG.decryptReveal >= total) {
+      el.textContent = finalText;
+      clearInterval(el._decInt);
+    }
+  }, speed);
+}
+
+/* ================================================================
+   REUSABLE EFFECT 2 — TYPING
+   ================================================================ */
+function typeText(el, text, speed = 45) {
+  return new Promise(resolve => {
+    if (REDUCED) { el.textContent = text; resolve(); return; }
+    let i = 0;
+    (function tick() {
+      if (i <= text.length) {
+        el.textContent = text.slice(0, i);
+        i++;
+        setTimeout(tick, speed);
+      } else resolve();
+    })();
+  });
+}
+
+/* ================================================================
+   REUSABLE EFFECT 3 — COUNT UP  (data-count="value" data-suffix="+")
+   ================================================================ */
+function countUp(el, target, suffix = "", dur = 1600) {
+  if (REDUCED) { el.textContent = target + suffix; return; }
+  const start = performance.now();
+  (function step(now) {
+    const p = Math.min((now - start) / dur, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.innerHTML = Math.floor(eased * target) + '<span class="suffix">' + suffix + '</span>';
+    if (p < 1) requestAnimationFrame(step);
+    else el.innerHTML = target + '<span class="suffix">' + suffix + '</span>';
+  })(start);
+}
+
+/* ================================================================
+   PRELOADER — boot sequence
+   ================================================================ */
+const bootLines = [
+  { t: "[  0.0000] Initializing kernel .............. ", ok: true },
+  { t: "[  0.4210] Mounting encrypted filesystem ..... ", ok: true },
+  { t: "[  0.8830] Loading security modules .......... ", ok: true },
+  { t: "[  1.2050] Starting intrusion detection ...... ", ok: true },
+  { t: "[  1.5510] Establishing encrypted connection . ", ok: true },
+  { t: "[  1.9900] Verifying credentials (SHA-256) ... ", ok: true },
+  { t: "ACCESS GRANTED. Welcome, operator.", ok: false, welcome: true },
+];
+
+function runPreloader() {
+  const term = document.getElementById("boot-terminal");
+  const pre = document.getElementById("preloader");
+  let skipped = false;
+
+  function finish() {
+    if (skipped) return; skipped = true;
+    if (!GSAP_OK) {  // no animation lib — just clear the preloader
+      pre.style.display = "none"; startSite(); return;
+    }
+    const tl = gsap.timeline({ onComplete: () => { pre.style.display = "none"; startSite(); } });
+    tl.to(".green-flash", { opacity: .9, duration: .12 })
+      .to(".green-flash", { opacity: 0, duration: .25 })
+      .to(".blast-door.top", { yPercent: -100, duration: .7, ease: "power3.inOut" }, "-=.1")
+      .to(".blast-door.bottom", { yPercent: 100, duration: .7, ease: "power3.inOut" }, "<")
+      .to(".boot-terminal, .boot-skip", { opacity: 0, duration: .3 }, "<");
+  }
+
+  // skippable
+  pre.addEventListener("click", finish, { once: false });
+
+  if (REDUCED) {  // no typing — just reveal
+    bootLines.forEach(l => {
+      const d = document.createElement("div");
+      d.className = "boot-line"; d.style.opacity = 1;
+      d.textContent = l.t + (l.ok ? "[OK]" : "");
+      term.appendChild(d);
+    });
+    setTimeout(finish, 400);
+    return;
+  }
+
+  let idx = 0;
+  function nextLine() {
+    if (skipped) return;
+    if (idx >= bootLines.length) { setTimeout(finish, 250); return; }
+    const l = bootLines[idx++];
+    const d = document.createElement("div");
+    d.className = "boot-line"; d.style.opacity = 1;
+    if (l.welcome) {
+      d.innerHTML = '<span class="ok">' + l.t + '</span><span class="boot-cursor"></span>';
+    } else {
+      d.innerHTML = l.t + '<span class="ok">[OK]</span>';
+    }
+    term.appendChild(d);
+    setTimeout(nextLine, CONFIG.bootLineDelay);
+  }
+  nextLine();
+}
+
+/* ================================================================
+   NETWORK PARTICLE CANVAS (persistent background)
+   ================================================================ */
+function initNetwork() {
+  if (REDUCED) return;
+  const canvas = document.getElementById("network-canvas");
+  const ctx = canvas.getContext("2d");
+  let w, h, particles = [];
+  const mouse = { x: -9999, y: -9999 };
+  const COUNT = SMALL ? Math.floor(CONFIG.particles / 2.4) : CONFIG.particles;
+  const LINK = CONFIG.particleLinkDist;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  function makeParticles() {
+    particles = [];
+    for (let i = 0; i < COUNT; i++) {
+      particles.push({
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35,
+        r: Math.random() * 1.6 + .8,
+      });
+    }
+  }
+  window.addEventListener("mousemove", e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener("mouseout", () => { mouse.x = mouse.y = -9999; });
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    for (const p of particles) {
+      p.x += p.vx; p.y += p.vy;
+      // gentle mouse push
+      const dx = p.x - mouse.x, dy = p.y - mouse.y;
+      const md = Math.hypot(dx, dy);
+      if (md < 120) { p.x += dx / md * .6; p.y += dy / md * .6; }
+      if (p.x < 0 || p.x > w) p.vx *= -1;
+      if (p.y < 0 || p.y > h) p.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,212,255,.7)";
+      ctx.fill();
+    }
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const a = particles[i], b = particles[j];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < LINK) {
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = "rgba(0,255,65," + (.14 * (1 - d / LINK)) + ")";
+          ctx.lineWidth = 1; ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  resize(); makeParticles(); draw();
+  window.addEventListener("resize", () => { resize(); makeParticles(); });
+}
+
+/* ================================================================
+   MATRIX RAIN (hero only — lazy started)
+   ================================================================ */
+function initMatrix() {
+  if (REDUCED || SMALL) return;
+  const canvas = document.getElementById("matrix-canvas");
+  const ctx = canvas.getContext("2d");
+  const hero = document.getElementById("hero");
+  let cols, drops, w, h, running = true;
+  const chars = "01ｱｲｳｴｵｶｷｸ日本語ｹｺｻｼｽ#$%<>ﾊﾋ".split("");
+  const fs = CONFIG.matrixFontSize;
+
+  function resize() {
+    w = canvas.width = hero.offsetWidth;
+    h = canvas.height = hero.offsetHeight;
+    cols = Math.floor(w / fs);
+    drops = Array(cols).fill(0).map(() => Math.random() * -20);
+  }
+  function draw() {
+    if (!running) return;
+    ctx.fillStyle = "rgba(10,14,20,.08)";
+    ctx.fillRect(0, 0, w, h);
+    ctx.font = fs + "px monospace";
+    for (let i = 0; i < cols; i++) {
+      const c = chars[Math.floor(Math.random() * chars.length)];
+      const x = i * fs, y = drops[i] * fs;
+      ctx.fillStyle = Math.random() > .96 ? "#fff" : CONFIG.colors.matrix;
+      ctx.fillText(c, x, y);
+      if (y > h && Math.random() > .975) drops[i] = 0;
+      drops[i] += .5;
+    }
+    requestAnimationFrame(draw);
+  }
+  resize(); draw();
+  window.addEventListener("resize", resize);
+  // pause when hero not visible (perf)
+  new IntersectionObserver(([e]) => {
+    running = e.isIntersecting;
+    if (running) draw();
+  }).observe(hero);
+}
+
+/* ================================================================
+   CUSTOM CURSOR
+   ================================================================ */
+function initCursor() {
+  if (REDUCED || TOUCH) { document.body.style.cursor = "auto"; return; }
+  const ret = document.querySelector(".cursor-reticle");
+  const dot = document.querySelector(".cursor-dot");
+  let mx = 0, my = 0, dx = 0, dy = 0;
+  window.addEventListener("mousemove", e => {
+    mx = e.clientX; my = e.clientY;
+    ret.style.left = mx + "px"; ret.style.top = my + "px";
+  });
+  (function trail() {
+    dx += (mx - dx) * .18; dy += (my - dy) * .18;
+    dot.style.left = dx + "px"; dot.style.top = dy + "px";
+    requestAnimationFrame(trail);
+  })();
+  document.querySelectorAll("a, button, input, textarea, [data-hover]").forEach(el => {
+    el.addEventListener("mouseenter", () => ret.classList.add("hovering"));
+    el.addEventListener("mouseleave", () => ret.classList.remove("hovering"));
+  });
+}
+
+/* ================================================================
+   CONTENT DATA  (edit freely)
+   ================================================================ */
+const SKILL_CARDS = [
+  { icon: "⚔️", title: "Offensive Security", desc: "Red-team ops, exploit dev, web & network penetration testing.", tags: ["Metasploit", "Burp Suite", "Nmap"] },
+  { icon: "🛡️", title: "Defensive Security", desc: "SOC monitoring, threat hunting, incident response, SIEM tuning.", tags: ["Splunk", "Wazuh", "Snort"] },
+  { icon: "🔬", title: "Forensics & RE", desc: "Malware analysis, memory forensics, reverse engineering.", tags: ["Ghidra", "Volatility", "IDA"] },
+  { icon: "💻", title: "Programming", desc: "Tooling & automation for security workflows.", tags: ["Python", "Bash", "C", "Go"] },
+  { icon: "☁️", title: "Cloud & Infra", desc: "Cloud security posture, hardening, container security.", tags: ["AWS Security", "Docker", "Linux"] },
+];
+const SKILL_BARS = [
+  { name: "Penetration Testing", val: 88 },
+  { name: "Network Security", val: 92 },
+  { name: "Malware Analysis", val: 80 },
+  { name: "Digital Forensics", val: 78 },
+  { name: "Python / Scripting", val: 90 },
+  { name: "Cloud Security (AWS)", val: 74 },
+];
+const CASES = [
+  { id: "#001", status: "RESOLVED", active: false, title: "ML-Based Network Intrusion Detection System",
+    desc: "Built an [NIDS] using a random-forest classifier on the CIC-IDS2017 dataset, achieving [98.4%] detection accuracy with real-time packet capture via Scapy.",
+    tags: ["Python", "scikit-learn", "Scapy", "Wireshark"], redact: ["NIDS", "98.4%"] },
+  { id: "#002", status: "ACTIVE", active: true, title: "Home-Lab SIEM & Detection Engineering",
+    desc: "Deployed an [ELK + Wazuh] SIEM across a virtualized lab, writing [42] custom detection rules mapped to MITRE ATT&CK and simulating APT-style attacks.",
+    tags: ["Elastic", "Wazuh", "MITRE ATT&CK", "Sysmon"], redact: ["ELK + Wazuh", "42"] },
+  { id: "#003", status: "RESOLVED", active: false, title: "Python Vulnerability Scanner",
+    desc: "Authored a modular scanner performing [port enumeration], service fingerprinting, and CVE correlation against the [NVD] API with threaded scanning.",
+    tags: ["Python", "asyncio", "NVD API", "Nmap"], redact: ["port enumeration", "NVD"] },
+  { id: "#004", status: "RESOLVED", active: false, title: "Automated Malware Sandbox",
+    desc: "Engineered an isolated [Cuckoo-based] sandbox for dynamic analysis, extracting [IOCs] and generating automated behavioral reports for triage.",
+    tags: ["Cuckoo", "YARA", "Docker", "VirtualBox"], redact: ["Cuckoo-based", "IOCs"] },
+  { id: "#005", status: "ONGOING", active: true, title: "CTF Writeup Collection",
+    desc: "Curated [60+] writeups spanning web, pwn, crypto, and forensics from HackTheBox, TryHackMe, and PicoCTF — documenting exploitation methodology.",
+    tags: ["Web", "Pwn", "Crypto", "Forensics"], redact: ["60+"] },
+  { id: "#006", status: "RESOLVED", active: false, title: "Phishing Detection Browser Extension",
+    desc: "Developed a [Chrome extension] flagging suspicious URLs using heuristic + [ML] scoring, cutting successful phishing clicks in user testing by [71%].",
+    tags: ["JavaScript", "TensorFlow.js", "REST"], redact: ["Chrome extension", "ML", "71%"] },
+];
+const TIMELINE = [
+  { date: "2024 — PRESENT", role: "M.S. Cybersecurity", org: CONFIG.university,
+    points: ["Focus: offensive security & threat intelligence", "GPA [3.9/4.0] — Dean's List", "TA for Network Security Fundamentals"] },
+  { date: "2023 — 2024", role: "Security Analyst Intern", org: "[COMPANY NAME]",
+    points: ["Triaged 200+ SOC alerts, reduced false positives 30%", "Authored SIEM detection rules & runbooks", "Supported quarterly internal pentests"] },
+  { date: "2020 — 2024", role: "B.S. Computer Science", org: "[UNDERGRAD UNIVERSITY]",
+    points: ["Minor in Mathematics", "President, Cybersecurity Club", "Led team to [Top 10] national CTF finish"] },
+  { date: "2022 — PRESENT", role: "Independent Security Researcher", org: "Self-directed",
+    points: ["Responsible disclosure on 3 web apps", "Active on HackTheBox & TryHackMe", "Open-source security tooling on GitHub"] },
+];
+const BADGES = [
+  { icon: "🎖️", title: "CompTIA Security+", sub: "Certified 2024" },
+  { icon: "🗡️", title: "eJPT", sub: "Junior Penetration Tester" },
+  { icon: "🏴", title: "TryHackMe", sub: "Top 1% — [SybilRank]" },
+  { icon: "🔓", title: "HackTheBox", sub: "Pro Hacker Rank" },
+  { icon: "🏆", title: "CTF Placements", sub: "3x Top-10 Finishes" },
+  { icon: "📜", title: "CEH (In Progress)", sub: "Expected 2026" },
+];
+const STATS = [
+  { num: 60, suffix: "+", lbl: "CTF challenges solved" },
+  { num: 12, suffix: "+", lbl: "security tools mastered" },
+  { num: 3,  suffix: "",  lbl: "research papers / writeups" },
+  { num: 500, suffix: "+", lbl: "lab hours logged" },
+];
+
+/* ================================================================
+   RENDER CONTENT
+   ================================================================ */
+function renderContent() {
+  // Skill cards
+  document.getElementById("skill-cards").innerHTML = SKILL_CARDS.map(c => `
+    <div class="skill-card" data-hover>
+      <div class="icon">${c.icon}</div>
+      <h3>${c.title}</h3>
+      <p>${c.desc}</p>
+      <div class="tags">${c.tags.map(t => `<span class="chip">${t}</span>`).join("")}</div>
+    </div>`).join("");
+
+  // Skill bars
+  document.getElementById("skill-bars").innerHTML = SKILL_BARS.map(b => `
+    <div class="bar-row">
+      <div class="bar-head"><span class="bar-name">${b.name}</span><span class="bar-pct" data-pct>0%</span></div>
+      <div class="bar-track"><div class="bar-fill" data-val="${b.val}"></div></div>
+    </div>`).join("");
+
+  // Cases
+  document.getElementById("cases").innerHTML = CASES.map(c => {
+    let desc = c.desc;
+    (c.redact || []).forEach(phrase => {
+      desc = desc.replace("[" + phrase + "]", `<span class="redact">${phrase}</span>`);
+    });
+    return `
+    <article class="case" data-hover>
+      <div class="case-noise"></div>
+      <div class="case-strip">
+        <span class="case-id">CASE ${c.id}</span>
+        <span class="case-status ${c.active ? "active" : ""}"><span class="sd"></span>STATUS: ${c.status}</span>
+      </div>
+      <div class="case-body">
+        <h3>${c.title}</h3>
+        <p>${desc}</p>
+        <div class="case-tags">${c.tags.map(t => `<span class="chip">${t}</span>`).join("")}</div>
+        <div class="case-links">
+          <a href="[GITHUB URL]" target="_blank" rel="noopener" data-hover>⌨ source</a>
+          <a href="#" data-hover>▶ demo</a>
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+
+  // Timeline
+  const tl = document.getElementById("timeline-el");
+  TIMELINE.forEach(item => {
+    const el = document.createElement("div");
+    el.className = "tl-item";
+    el.innerHTML = `
+      <div class="tl-node"></div>
+      <div class="tl-card">
+        <div class="tl-date">${item.date}</div>
+        <div class="tl-role">${item.role}</div>
+        <div class="tl-org">${item.org}</div>
+        <ul>${item.points.map(p => `<li>${p}</li>`).join("")}</ul>
+      </div>`;
+    tl.appendChild(el);
+  });
+
+  // Badges
+  document.getElementById("badges").innerHTML = BADGES.map(b => `
+    <div class="badge" data-hover>
+      <span class="verified-stamp">VERIFIED ✓</span>
+      <div class="b-icon">${b.icon}</div>
+      <h3>${b.title}</h3>
+      <p>${b.sub}</p>
+    </div>`).join("");
+
+  // Stats
+  document.getElementById("stats").innerHTML = STATS.map(s => `
+    <div class="stat">
+      <div class="num" data-count="${s.num}" data-suffix="${s.suffix}">0</div>
+      <div class="lbl">${s.lbl}</div>
+    </div>`).join("");
+}
+
+/* ================================================================
+   SCROLL ANIMATIONS (GSAP + ScrollTrigger)
+   ================================================================ */
+function initScrollAnims() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Decrypt-on-scroll for every heading with [data-decrypt]
+  document.querySelectorAll("[data-decrypt]").forEach(el => {
+    const final = el.getAttribute("data-decrypt");
+    el.textContent = REDUCED ? final : "";
+    ScrollTrigger.create({
+      trigger: el, start: "top 85%",
+      onEnter: () => decryptText(el, final),
+      onEnterBack: () => decryptText(el, final),
+    });
+  });
+
+  // Generic section-content fade/slide (labels, intros, terminals)
+  gsap.utils.toArray(".section-label, .section-intro, .contact-intro, .contact-grid .terminal")
+    .forEach(el => {
+      gsap.from(el, {
+        opacity: 0, y: 40, duration: .8, ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none reverse" },
+      });
+    });
+
+  // Hero parallax + desaturate on scroll away
+  if (!REDUCED) {
+    gsap.to(".hero-inner", {
+      yPercent: -30, opacity: .2, filter: "saturate(.3)", ease: "none",
+      scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true },
+    });
+  }
+
+  // About terminal glitch-in + type-out
+  ScrollTrigger.create({
+    trigger: "#about-terminal", start: "top 78%", once: true,
+    onEnter: runAboutTerminal,
+  });
+
+  // Profile scan reveal
+  ScrollTrigger.create({
+    trigger: "#scan-frame", start: "top 75%", once: true,
+    onEnter: () => {
+      const frame = document.getElementById("scan-frame");
+      const line = document.getElementById("scan-line");
+      if (REDUCED) { frame.classList.add("revealed"); return; }
+      gsap.timeline()
+        .set(line, { opacity: 1, top: "0%" })
+        .to(line, { top: "100%", duration: 1.3, ease: "power1.inOut" })
+        .add(() => frame.classList.add("revealed"), "-=1.0")
+        .to(line, { opacity: 0, duration: .3 });
+    },
+  });
+
+  // Skill cards — 3D flip stagger
+  gsap.from(".skill-card", {
+    rotationY: -90, opacity: 0, y: 30, duration: .7, stagger: .12, ease: "back.out(1.4)",
+    scrollTrigger: { trigger: "#skill-cards", start: "top 80%", toggleActions: "play none none reverse" },
+  });
+
+  // Skill bars — fill only when in view
+  document.querySelectorAll(".bar-row").forEach(row => {
+    const fill = row.querySelector(".bar-fill");
+    const pctEl = row.querySelector("[data-pct]");
+    const val = +fill.getAttribute("data-val");
+    ScrollTrigger.create({
+      trigger: row, start: "top 88%", once: true,
+      onEnter: () => {
+        if (REDUCED) { fill.style.width = val + "%"; pctEl.textContent = val + "%"; fill.classList.add("done"); return; }
+        gsap.to(fill, { width: val + "%", duration: 1.4, ease: "power2.out",
+          onComplete: () => fill.classList.add("done") });
+        const o = { v: 0 };
+        gsap.to(o, { v: val, duration: 1.4, ease: "power2.out",
+          onUpdate: () => pctEl.textContent = Math.round(o.v) + "%" });
+      },
+    });
+  });
+
+  // Case files — alternating slide-in + redacted reveal
+  gsap.utils.toArray(".case").forEach((card, i) => {
+    gsap.from(card, {
+      x: i % 2 === 0 ? -80 : 80, rotation: i % 2 === 0 ? -2 : 2, opacity: 0,
+      duration: .8, ease: "power3.out",
+      scrollTrigger: { trigger: card, start: "top 82%", toggleActions: "play none none reverse" },
+    });
+    ScrollTrigger.create({
+      trigger: card, start: "top 70%", once: true,
+      onEnter: () => card.querySelectorAll(".redact").forEach((r, k) =>
+        setTimeout(() => r.classList.add("revealed"), 500 + k * 220)),
+    });
+  });
+
+  // Timeline — scrubbed line draw + node pulse
+  const tlProgress = document.getElementById("tl-progress");
+  gsap.to(tlProgress, {
+    height: "100%", ease: "none",
+    scrollTrigger: { trigger: "#timeline-el", start: "top 60%", end: "bottom 70%", scrub: .5 },
+  });
+  gsap.utils.toArray(".tl-item").forEach(item => {
+    const node = item.querySelector(".tl-node");
+    gsap.from(item.querySelector(".tl-card"), {
+      opacity: 0, y: 40, duration: .7,
+      scrollTrigger: { trigger: item, start: "top 80%", toggleActions: "play none none reverse" },
+    });
+    ScrollTrigger.create({
+      trigger: item, start: "top 65%",
+      onEnter: () => node.classList.add("live"),
+      onLeaveBack: () => node.classList.remove("live"),
+    });
+  });
+
+  // Badges — scale-in stagger + VERIFIED stamp slam
+  gsap.utils.toArray(".badge").forEach((b, i) => {
+    const stamp = b.querySelector(".verified-stamp");
+    ScrollTrigger.create({
+      trigger: b, start: "top 85%", once: true,
+      onEnter: () => {
+        if (REDUCED) { gsap.set(b, { opacity: 1 }); gsap.set(stamp, { opacity: 1, scale: 1 }); return; }
+        gsap.timeline({ delay: i * .1 })
+          .from(b, { scale: .8, opacity: 0, duration: .5, ease: "back.out(1.6)" })
+          .to(stamp, { opacity: 1, scale: 1, duration: .3, ease: "back.out(3)" }, "+=.15");
+      },
+    });
+  });
+
+  // Stats — count up
+  document.querySelectorAll(".stat .num").forEach(el => {
+    ScrollTrigger.create({
+      trigger: el, start: "top 88%", once: true,
+      onEnter: () => countUp(el, +el.dataset.count, el.dataset.suffix),
+    });
+  });
+}
+
+/* ================================================================
+   ABOUT TERMINAL — sequential command typing
+   ================================================================ */
+async function runAboutTerminal() {
+  const term = document.getElementById("about-terminal");
+  term.innerHTML = "";
+  const seq = [
+    { cmd: true, text: "whoami" },
+    { out: `${CONFIG.name} — Cybersecurity Master's candidate.` },
+    { out: `Studying at ${CONFIG.university}. I turn curiosity into controlled chaos:`, dim: true },
+    { out: `finding the cracks before adversaries do, then sealing them.`, dim: true },
+    { blank: true },
+    { cmd: true, text: "cat interests.txt" },
+    { out: "▹ Penetration testing & red-team operations" },
+    { out: "▹ Malware analysis & reverse engineering" },
+    { out: "▹ Network defense, SIEM & threat hunting" },
+    { out: "▹ Digital forensics & incident response" },
+    { blank: true },
+    { cmd: true, text: "echo $STATUS" },
+    { out: "Available for internships & research collaboration ✓" },
+  ];
+
+  for (const line of seq) {
+    const div = document.createElement("div");
+    div.className = "term-line";
+    if (line.blank) { div.innerHTML = "&nbsp;"; term.appendChild(div); await wait(80); continue; }
+    if (line.cmd) {
+      div.innerHTML = `<span class="term-cmd"><span class="p">user@portfolio:~$</span> </span>`;
+      term.appendChild(div);
+      const span = document.createElement("span");
+      span.className = "term-cmd"; div.appendChild(span);
+      await typeText(span, line.text, 42);
+      await wait(140);
+    } else {
+      div.className += line.dim ? " term-out dim" : " term-out";
+      term.appendChild(div);
+      if (REDUCED) div.textContent = line.out;
+      else await typeText(div, line.out, 12);
+      await wait(60);
+    }
+  }
+}
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+/* ================================================================
+   NAV — show after hero + scrollspy + progress bar
+   ================================================================ */
+function initNav() {
+  const nav = document.getElementById("navbar");
+  const links = [...document.querySelectorAll(".nav-links a")];
+  const sections = links.map(a => document.querySelector(a.getAttribute("href")));
+  const bar = document.getElementById("scan-bar");
+  const readout = document.getElementById("scan-readout");
+  const toggle = document.querySelector(".nav-toggle");
+  const linkList = document.getElementById("nav-links");
+
+  toggle.addEventListener("click", () => {
+    const open = linkList.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", open);
+  });
+  links.forEach(a => a.addEventListener("click", () => linkList.classList.remove("open")));
+
+  function onScroll() {
+    const y = window.scrollY;
+    const hero = document.getElementById("hero").offsetHeight;
+    nav.classList.toggle("visible", y > hero * .6);
+
+    // progress
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = Math.min(Math.round((y / max) * 100), 100);
+    bar.style.width = pct + "%";
+    readout.textContent = "SYSTEM SCAN: " + pct + "%";
+
+    // scrollspy
+    let active = sections[0];
+    sections.forEach(s => { if (s && s.getBoundingClientRect().top <= 140) active = s; });
+    links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + active.id));
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+}
+
+/* ================================================================
+   HERO NAME TYPE
+   ================================================================ */
+function typeHeroName() {
+  const el = document.getElementById("hero-name");
+  const name = CONFIG.name;
+  if (REDUCED) { el.innerHTML = name + '<span class="type-cursor">_</span>'; return; }
+  let i = 0;
+  el.innerHTML = '<span class="type-cursor">█</span>';
+  (function tick() {
+    if (i <= name.length) {
+      el.innerHTML = name.slice(0, i) + '<span class="type-cursor">█</span>';
+      i++;
+      setTimeout(tick, CONFIG.typeSpeed);
+    }
+  })();
+}
+
+/* ================================================================
+   CONTACT FORM — fake encryption
+   ================================================================ */
+function initForm() {
+  const form = document.getElementById("contact-form");
+  const status = document.getElementById("form-status");
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const msg = form.message.value.trim();
+    if (!name || !email || !msg) { status.textContent = "⚠ ERROR: all fields required."; status.style.color = "var(--alert)"; return; }
+
+    status.style.color = "var(--matrix)";
+    const msgField = form.message;
+    const original = msg;
+
+    if (REDUCED) { showSent(); return; }
+
+    // scramble message text as "encryption"
+    status.textContent = "⧗ Encrypting payload...";
+    let frames = 0;
+    const int = setInterval(() => {
+      msgField.value = original.split("").map(ch =>
+        ch === " " ? " " : GLYPHS[Math.floor(Math.random() * GLYPHS.length)]).join("");
+      frames++;
+      if (frames > 14) { clearInterval(int); msgField.value = original; showSent(); }
+    }, 55);
+
+    function showSent() {
+      status.textContent = "✓ Message encrypted and sent — response en route.";
+      // mailto fallback (front-end only — TODO: wire a real backend/Formspree)
+      setTimeout(() => {
+        window.location.href = `mailto:[EMAIL]?subject=Secure%20Channel%20from%20${encodeURIComponent(name)}&body=${encodeURIComponent(msg + "\n\n— " + name + " (" + email + ")")}`;
+      }, 700);
+      form.reset();
+    }
+  });
+}
+
+/* ================================================================
+   EASTER EGG — type "sudo"
+   ================================================================ */
+function initEasterEgg() {
+  let buf = "";
+  const flash = document.getElementById("egg-flash");
+  window.addEventListener("keydown", e => {
+    if (e.target.matches("input, textarea")) return;
+    buf = (buf + e.key).slice(-4).toLowerCase();
+    if (buf === "sudo") {
+      gsap.timeline()
+        .to(flash, { opacity: 1, duration: .12 })
+        .to(flash, { opacity: 0, duration: .5, delay: .35 });
+      buf = "";
+    }
+  });
+}
+
+/* ================================================================
+   BOOT ORDER
+   ================================================================ */
+function startSite() {
+  typeHeroName();
+  initNav();
+  initForm();
+  if (GSAP_OK) {
+    initScrollAnims();
+    ScrollTrigger.refresh();
+  } else {
+    initStaticReveal();  // graceful degradation without GSAP
+  }
+}
+
+/* ================================================================
+   STATIC FALLBACK — no GSAP: reveal content with lightweight
+   IntersectionObserver + the pure-JS decrypt/type/count effects.
+   ================================================================ */
+function initStaticReveal() {
+  // decrypt headings on scroll
+  const io = new IntersectionObserver((entries, obs) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      obs.unobserve(el);
+      if (el.hasAttribute("data-decrypt")) decryptText(el, el.getAttribute("data-decrypt"));
+      if (el.id === "about-terminal") runAboutTerminal();
+      if (el.id === "scan-frame") el.classList.add("revealed");
+      if (el.classList.contains("bar-row")) {
+        const f = el.querySelector(".bar-fill"), p = el.querySelector("[data-pct]"), v = +f.dataset.val;
+        f.style.transition = "width 1.2s ease"; f.style.width = v + "%"; f.classList.add("done");
+        countUp(p, v, "%");
+      }
+      if (el.classList.contains("case")) el.querySelectorAll(".redact").forEach((r,k)=>setTimeout(()=>r.classList.add("revealed"),400+k*200));
+      if (el.classList.contains("tl-item")) el.querySelector(".tl-node").classList.add("live");
+      if (el.classList.contains("badge")) el.querySelector(".verified-stamp").style.cssText = "opacity:1;transform:rotate(-14deg) scale(1)";
+      if (el.classList.contains("stat")) { const n = el.querySelector(".num"); countUp(n, +n.dataset.count, n.dataset.suffix); }
+    });
+  }, { threshold: .3 });
+
+  document.querySelectorAll("[data-decrypt], #about-terminal, #scan-frame, .bar-row, .case, .tl-item, .badge, .stat")
+    .forEach(el => io.observe(el));
+
+  // draw timeline line via scroll listener (no scrub)
+  const tlp = document.getElementById("tl-progress"), tlEl = document.getElementById("timeline-el");
+  window.addEventListener("scroll", () => {
+    const r = tlEl.getBoundingClientRect();
+    const p = Math.max(0, Math.min(1, (window.innerHeight * .6 - r.top) / r.height));
+    tlp.style.height = (p * 100) + "%";
+  }, { passive: true });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderContent();
+  initNetwork();
+  initMatrix();
+  initCursor();
+  initEasterEgg();
+  runPreloader(); // -> calls startSite() when doors open
+});
+</script>
+</body>
+</html>
