@@ -408,6 +408,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   transform: rotate(-14deg) scale(2.4); opacity: 0; text-shadow: var(--glow-green);
   box-shadow: var(--glow-green); letter-spacing: .05em;
 }
+.verified-stamp.pending {
+  color: var(--cyan); border-color: var(--cyan);
+  text-shadow: var(--glow-cyan); box-shadow: var(--glow-cyan);
+}
 .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 20px; }
 .stat { text-align: center; padding: 26px; border: 1px solid var(--line); border-radius: 12px; background: rgba(13,18,32,.5); }
 .stat .num { font-family: var(--mono); font-size: clamp(34px,6vw,52px); font-weight: 800; color: var(--matrix); text-shadow: var(--glow-green); }
@@ -1038,19 +1042,21 @@ const TIMELINE = [
       "Ethical Hacking, Cryptography, Malware Analysis, Web App Security & Incident Response",
     ] },
 ];
+// Set pending:true for training-complete-but-not-yet-certified items —
+// their stamp reads "IN PROGRESS" (cyan) instead of "VERIFIED" (green).
 const BADGES = [
-  { icon: "🎖️", title: "CompTIA Security+", sub: "Certified 2024" },
-  { icon: "🗡️", title: "eJPT", sub: "Junior Penetration Tester" },
-  { icon: "🏴", title: "TryHackMe", sub: "Top 1% — [SybilRank]" },
-  { icon: "🔓", title: "HackTheBox", sub: "Pro Hacker Rank" },
-  { icon: "🏆", title: "CTF Placements", sub: "3x Top-10 Finishes" },
-  { icon: "📜", title: "CEH (In Progress)", sub: "Expected 2026" },
+  { icon: "🛡️", title: "Google Cybersecurity", sub: "Professional Certificate — Coursera" },
+  { icon: "🌐", title: "Cisco Cybersecurity", sub: "Certified" },
+  { icon: "🎯", title: "MITRE ATT&CK & ATLAS", sub: "Framework Proficiency" },
+  { icon: "☕", title: "Full-Stack Java", sub: "Development Certificate" },
+  { icon: "🗡️", title: "CEH", sub: "Training complete — cert pending", pending: true },
+  { icon: "🌉", title: "CCNA", sub: "Training complete — cert pending", pending: true },
 ];
 const STATS = [
-  { num: 60, suffix: "+", lbl: "CTF challenges solved" },
-  { num: 12, suffix: "+", lbl: "security tools mastered" },
-  { num: 3,  suffix: "",  lbl: "research papers / writeups" },
-  { num: 500, suffix: "+", lbl: "lab hours logged" },
+  { num: 6,  suffix: "",  lbl: "certifications & trainings" },
+  { num: 4,  suffix: "+", lbl: "major security & AI projects" },
+  { num: 11, suffix: "+", lbl: "core technologies" },
+  { num: 4,  suffix: "+", lbl: "years in cyber security" },
 ];
 
 /* ================================================================
@@ -1123,7 +1129,7 @@ function renderContent() {
   // Badges
   document.getElementById("badges").innerHTML = BADGES.map(b => `
     <div class="badge" data-hover>
-      <span class="verified-stamp">VERIFIED ✓</span>
+      <span class="verified-stamp${b.pending ? " pending" : ""}">${b.pending ? "IN PROGRESS ⧗" : "VERIFIED ✓"}</span>
       <div class="b-icon">${b.icon}</div>
       <h3>${b.title}</h3>
       <p>${b.sub}</p>
