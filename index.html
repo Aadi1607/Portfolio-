@@ -595,7 +595,7 @@ footer { border-top: 1px solid var(--line); padding: 40px 0; text-align: center;
   <div class="wrap">
     <div class="section-label">03 // Field Operations</div>
     <h2 class="section-title" data-decrypt="Case Files">Case Files</h2>
-    <p class="section-intro">Selected engagements and research. Classified details declassify on inspection.</p>
+    <p class="section-intro">Selected engagements &amp; research. Some professional work is described at a high level due to client confidentiality — deeper technical detail available on request.</p>
     <div class="cases" id="cases"><!-- injected --></div>
   </div>
 </section>
@@ -696,7 +696,7 @@ const CONFIG = {
   // --- Identity (edit these) ---
   name: "AADITYA CHAUDHARI",           // your name (hero types this out)
   subtitle: "Master's Student in Cybersecurity",
-  university: "[UNIVERSITY NAME]",
+  university: "Ratan Tata Maharashtra State Skills University (RTMSSU), Pune",
 
   // --- Visual ---
   colors: { matrix: "#00ff41", cyan: "#00d4ff", alert: "#ff3e3e" },
@@ -986,35 +986,53 @@ const SKILL_BARS = [
   { name: "Python / Scripting", val: 90 },
   { name: "Cloud Security (AWS)", val: 74 },
 ];
+// Each case: links can be an array of {label, url}; omit for the default
+// "source / demo" pair, or use confidential:true to show a lock instead.
 const CASES = [
-  { id: "#001", status: "RESOLVED", active: false, title: "ML-Based Network Intrusion Detection System",
-    desc: "Built an [NIDS] using a random-forest classifier on the CIC-IDS2017 dataset, achieving [98.4%] detection accuracy with real-time packet capture via Scapy.",
-    tags: ["Python", "scikit-learn", "Scapy", "Wireshark"], redact: ["NIDS", "98.4%"] },
-  { id: "#002", status: "ACTIVE", active: true, title: "Home-Lab SIEM & Detection Engineering",
-    desc: "Deployed an [ELK + Wazuh] SIEM across a virtualized lab, writing [42] custom detection rules mapped to MITRE ATT&CK and simulating APT-style attacks.",
-    tags: ["Elastic", "Wazuh", "MITRE ATT&CK", "Sysmon"], redact: ["ELK + Wazuh", "42"] },
-  { id: "#003", status: "RESOLVED", active: false, title: "Python Vulnerability Scanner",
-    desc: "Authored a modular scanner performing [port enumeration], service fingerprinting, and CVE correlation against the [NVD] API with threaded scanning.",
-    tags: ["Python", "asyncio", "NVD API", "Nmap"], redact: ["port enumeration", "NVD"] },
-  { id: "#004", status: "RESOLVED", active: false, title: "Automated Malware Sandbox",
-    desc: "Engineered an isolated [Cuckoo-based] sandbox for dynamic analysis, extracting [IOCs] and generating automated behavioral reports for triage.",
-    tags: ["Cuckoo", "YARA", "Docker", "VirtualBox"], redact: ["Cuckoo-based", "IOCs"] },
-  { id: "#005", status: "ONGOING", active: true, title: "CTF Writeup Collection",
-    desc: "Curated [60+] writeups spanning web, pwn, crypto, and forensics from HackTheBox, TryHackMe, and PicoCTF — documenting exploitation methodology.",
-    tags: ["Web", "Pwn", "Crypto", "Forensics"], redact: ["60+"] },
-  { id: "#006", status: "RESOLVED", active: false, title: "Phishing Detection Browser Extension",
-    desc: "Developed a [Chrome extension] flagging suspicious URLs using heuristic + [ML] scoring, cutting successful phishing clicks in user testing by [71%].",
-    tags: ["JavaScript", "TensorFlow.js", "REST"], redact: ["Chrome extension", "ML", "71%"] },
+  { id: "#001", status: "CLASSIFIED", active: true, confidential: true,
+    title: "Agentic AI Dark Web Intelligence Platform",
+    desc: "AI-powered platform for automated intelligence collection and analysis across [dark web] and open sources. Built scalable crawling, document processing, semantic search, and knowledge-extraction pipelines — with [local LLMs] driving contextualization, entity extraction, and intelligent retrieval, on optimized distributed workflows.",
+    tags: ["Python", "Playwright", "Docker", "PostgreSQL", "Redis", "Ollama (Local LLMs)"],
+    redact: ["dark web", "local LLMs"] },
+
+  { id: "#002", status: "DEPLOYED", active: false,
+    title: "AI-Powered Surveillance & Face Recognition System",
+    desc: "Real-time surveillance system pairing high-accuracy facial recognition ([InsightFace / ArcFace]) with intelligent visual analytics — live face detection, person recognition & matching, and event-based scene understanding, tuned for [real-world security] deployments.",
+    tags: ["Python", "OpenCV", "InsightFace (ArcFace)", "Deep Learning"],
+    redact: ["InsightFace / ArcFace", "real-world security"] },
+
+  { id: "#003", status: "RESOLVED", active: false,
+    title: "OSINT Web Crawler",
+    desc: "Automated [OSINT] crawler that collects and organizes publicly available information at scale — intelligent content extraction, structured data processing, automated indexing, and information-retrieval workflows on a reliable, high-performance architecture.",
+    tags: ["Python", "Playwright", "Docker", "PostgreSQL", "Redis", "Linux"],
+    redact: ["OSINT"] },
+
+  { id: "#004", status: "RESOLVED", active: false,
+    title: "Real-Time Malware Detection Browser Extension",
+    desc: "Chrome extension (Manifest V3) for real-time malware detection of files and URLs via the [VirusTotal API] — drag-and-drop file scanning with detailed reports, downloadable [PDF] security summaries, and a clean, accessible UI.",
+    tags: ["JavaScript", "HTML", "CSS", "Manifest V3", "VirusTotal API"],
+    redact: ["VirusTotal API", "PDF"] },
 ];
 const TIMELINE = [
-  { date: "2024 — PRESENT", role: "M.S. Cybersecurity", org: CONFIG.university,
-    points: ["Focus: offensive security & threat intelligence", "GPA [3.9/4.0] — Dean's List", "TA for Network Security Fundamentals"] },
-  { date: "2023 — 2024", role: "Security Analyst Intern", org: "[COMPANY NAME]",
-    points: ["Triaged 200+ SOC alerts, reduced false positives 30%", "Authored SIEM detection rules & runbooks", "Supported quarterly internal pentests"] },
-  { date: "2020 — 2024", role: "B.S. Computer Science", org: "[UNDERGRAD UNIVERSITY]",
-    points: ["Minor in Mathematics", "President, Cybersecurity Club", "Led team to [Top 10] national CTF finish"] },
-  { date: "2022 — PRESENT", role: "Independent Security Researcher", org: "Self-directed",
-    points: ["Responsible disclosure on 3 web apps", "Active on HackTheBox & TryHackMe", "Open-source security tooling on GitHub"] },
+  { date: "[2024] — PRESENT", role: "M.Tech in Cyber Security (Pursuing)",
+    org: "Ratan Tata Maharashtra State Skills University (RTMSSU), Pune",
+    points: [
+      "First Year CGPA: 8.66 / 10",
+      "Coursework: Advanced Cyber Security, Network Security, Digital Forensics",
+      "Threat Intelligence, AI in Cybersecurity & Secure Systems",
+    ] },
+  { date: "[2020 — 2024]", role: "B.Tech in Computer Science & Engineering",
+    org: "Sandip University, Nashik — Cyber Security & Forensics",
+    points: [
+      "CGPA: 8.50 / 10",
+      "Specialization: Cyber Security & Forensics",
+      "Ethical Hacking, Cryptography, Malware Analysis, Web App Security & Incident Response",
+    ] },
+  // --- Placeholders below — fill with your work experience or delete ---
+  { date: "[ADD DATES]", role: "Security Analyst Intern", org: "[COMPANY NAME]",
+    points: ["Triaged SOC alerts & tuned detections", "Authored SIEM rules & runbooks", "Supported internal pentests"] },
+  { date: "ONGOING", role: "Independent Security Researcher", org: "Self-directed",
+    points: ["Active on HackTheBox & TryHackMe", "CTF challenges & writeups", "Open-source security tooling on GitHub"] },
 ];
 const BADGES = [
   { icon: "🎖️", title: "CompTIA Security+", sub: "Certified 2024" },
@@ -1057,6 +1075,15 @@ function renderContent() {
     (c.redact || []).forEach(phrase => {
       desc = desc.replace("[" + phrase + "]", `<span class="redact">${phrase}</span>`);
     });
+    // Build the links row: confidential -> lock; custom links -> those; else default pair
+    let linksHTML;
+    if (c.confidential) {
+      linksHTML = `<span style="color:var(--alert)">🔒 details confidential — available on request</span>`;
+    } else if (Array.isArray(c.links) && c.links.length) {
+      linksHTML = c.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener" data-hover>${l.label}</a>`).join("");
+    } else {
+      linksHTML = `<a href="[GITHUB URL]" target="_blank" rel="noopener" data-hover>⌨ source</a><a href="#" data-hover>▶ demo</a>`;
+    }
     return `
     <article class="case" data-hover>
       <div class="case-noise"></div>
@@ -1068,10 +1095,7 @@ function renderContent() {
         <h3>${c.title}</h3>
         <p>${desc}</p>
         <div class="case-tags">${c.tags.map(t => `<span class="chip">${t}</span>`).join("")}</div>
-        <div class="case-links">
-          <a href="[GITHUB URL]" target="_blank" rel="noopener" data-hover>⌨ source</a>
-          <a href="#" data-hover>▶ demo</a>
-        </div>
+        <div class="case-links">${linksHTML}</div>
       </div>
     </article>`;
   }).join("");
