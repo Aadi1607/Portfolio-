@@ -14,7 +14,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
 <style>
 :root{
@@ -152,9 +152,9 @@ body.has-cursor .cursor{display:block}
 .globe-halo{position:absolute;inset:12%;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(94,242,255,.16),rgba(139,123,255,.08) 45%,transparent 70%);filter:blur(10px);pointer-events:none}
 .hero-inner{position:relative;z-index:2;width:100%}
 .eyebrow{display:inline-flex;align-items:center;gap:10px;padding:7px 14px 7px 10px;border-radius:999px;border:1px solid var(--line-2);background:rgba(10,15,26,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
-.hero-name{margin:28px 0 22px;font-size:clamp(54px,11.5vw,168px);font-weight:600;line-height:.9;letter-spacing:-.055em}
-.hero-name .line{display:block;overflow:hidden;padding-bottom:.06em}
-.hero-name .line:nth-child(2){font-family:var(--f-serif);font-style:italic;font-weight:400;letter-spacing:-.03em;padding-left:.12em}
+.hero-name{margin:30px 0 26px;font-family:"Orbitron",var(--f-display);font-size:clamp(38px,7.4vw,116px);font-weight:900;line-height:1;letter-spacing:.01em;text-transform:uppercase}
+.hero-name .line{display:block;overflow:hidden;padding:.02em 0 .08em}
+.hero-name .line:nth-child(2){filter:drop-shadow(0 0 28px rgba(139,123,255,.4))}
 .hero-name .ch{display:inline-block;will-change:transform}
 .hero-role{font-size:clamp(18px,2.3vw,26px);color:var(--muted);font-weight:300;letter-spacing:-.01em;max-width:640px;min-height:2.6em}
 .hero-role strong{color:var(--text);font-weight:500}
@@ -363,7 +363,22 @@ section.block{position:relative;padding:clamp(96px,14vw,170px) 0}
 
 /* ---------- footer ---------- */
 footer{position:relative;padding:60px 0 34px;border-top:1px solid var(--line);overflow:hidden}
-.foot-name{font-size:clamp(64px,17vw,260px);font-weight:600;letter-spacing:-.065em;line-height:.8;color:transparent;-webkit-text-stroke:1px rgba(140,170,220,.2);white-space:nowrap;text-align:center;user-select:none;background:linear-gradient(90deg,transparent,rgba(94,242,255,.35),transparent);background-size:40% 100%;background-repeat:no-repeat;background-position:var(--fx,-40%) 0;-webkit-background-clip:text;background-clip:text}
+.foot-top{display:grid;grid-template-columns:1.2fr 1fr auto;gap:32px;align-items:center;padding:30px;border-radius:22px;border:1px solid var(--line-2);background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.foot-brand{display:flex;align-items:center;gap:16px}
+.foot-brand .mark{width:52px;height:52px;flex:none;display:grid;place-items:center;border-radius:14px;border:1px solid rgba(94,242,255,.35);background:linear-gradient(140deg,rgba(94,242,255,.14),rgba(139,123,255,.08));box-shadow:0 0 30px -6px rgba(94,242,255,.5)}
+.foot-brand .mark svg{width:26px;height:26px}
+.foot-brand b{display:block;font-family:"Orbitron",var(--f-display);font-weight:700;font-size:17px;letter-spacing:.04em;text-transform:uppercase}
+.foot-brand span{display:block;margin-top:4px;font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.foot-echo{margin-top:14px;font-family:var(--f-mono);font-size:12px;color:var(--mint)}
+.foot-echo::after{content:"";display:inline-block;width:.55em;height:1em;margin-left:4px;vertical-align:-.15em;background:var(--mint);animation:blink 1s steps(1) infinite}
+.foot-nav{display:grid;grid-template-columns:repeat(2,auto);gap:8px 28px;justify-content:start;font-size:14px;color:var(--muted)}
+.foot-nav a{transition:color .3s}
+.foot-nav a:hover{color:var(--cyan)}
+.foot-social{display:flex;gap:10px}
+.foot-social a{width:46px;height:46px;display:grid;place-items:center;border-radius:12px;border:1px solid var(--line-2);color:var(--muted);transition:color .3s,border-color .3s,transform .4s var(--ease),box-shadow .4s}
+.foot-social a:hover{color:var(--cyan);border-color:rgba(94,242,255,.5);transform:translateY(-3px);box-shadow:0 10px 30px -10px rgba(94,242,255,.6)}
+.foot-social svg{width:19px;height:19px}
+@media (max-width:860px){.foot-top{grid-template-columns:1fr;gap:24px;padding:24px}}
 .foot-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:18px;margin-top:40px;font-family:var(--f-mono);font-size:12px;color:var(--dim)}
 .foot-row kbd{font-family:var(--f-mono);padding:2px 7px;border:1px solid var(--line-2);border-radius:5px;color:var(--cyan)}
 .to-top{display:inline-flex;align-items:center;gap:8px;color:var(--muted);transition:color .3s}
@@ -718,7 +733,26 @@ html.gl-on #globe{display:none}
 
 <footer>
   <div class="wrap">
-    <div class="foot-name" id="foot-name" aria-hidden="true">CHAUDHARI</div>
+    <div class="foot-top">
+      <div>
+        <div class="foot-brand">
+          <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#5ef2ff" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2 4 5.5v6c0 5 3.4 9 8 10.5 4.6-1.5 8-5.5 8-10.5v-6z"/><path d="m8.5 12 2.5 2.5L16 9.5" stroke-linecap="round"/></svg></span>
+          <div><b>Aaditya Chaudhari</b><span>Cyber Security · Threat Intelligence · AI</span></div>
+        </div>
+        <div class="foot-echo">$ echo "stay curious, stay secure"</div>
+      </div>
+      <nav class="foot-nav" aria-label="Footer">
+        <a href="#about">About</a><a href="#work">Case Files</a>
+        <a href="#skills">Arsenal</a><a href="#journey">Journey</a>
+        <a href="#certs">Credentials</a><a href="#contact">Contact</a>
+      </nav>
+      <div class="foot-social">
+        <a href="https://www.linkedin.com/in/aaditya-chaudhari-20324a240" target="_blank" rel="noopener" aria-label="LinkedIn" data-magnetic><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1V21h-4v-5.1c0-1.22-.02-2.78-1.7-2.78-1.7 0-1.96 1.33-1.96 2.7V21h-4z"/></svg></a>
+        <a href="mailto:aadityachaudhari1602@gmail.com" aria-label="Email" data-magnetic><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
+        <a href="tel:+919022392590" aria-label="Phone" data-magnetic><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></a>
+        <a href="Aaditya_Chaudhari_Resume.pdf" download aria-label="Download CV" data-magnetic><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></a>
+      </div>
+    </div>
     <div class="foot-row">
       <span>© 2026 Aaditya Chaudhari — secured with 256-bit determination.</span>
       <span>Type <kbd>sudo</kbd> anywhere for a root shell</span>
@@ -1442,6 +1476,7 @@ function initNav() {
     const p = scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight);
     $("#hud-pct").textContent = String(Math.round(p * 100)).padStart(3, "0");
     $("#hud-bar").style.setProperty("--p", p);
+    $("#hud").style.visibility = innerHeight + scrollY > document.documentElement.scrollHeight - 140 ? "hidden" : "";
   }, { passive: true });
 
   const tog = $(".nav-toggle"), menu = $("#mobile-menu");
@@ -1586,8 +1621,7 @@ function initScroll() {
   ScrollTrigger.sort();
   ScrollTrigger.refresh();
 
-  // footer sweep
-  gsap.fromTo("#foot-name", { "--fx": "-40%" }, { "--fx": "140%", ease: "none", scrollTrigger: { trigger: "footer", start: "top bottom", end: "bottom bottom", scrub: true } });
+  gsap.from(".foot-top", { opacity: 0, y: 40, duration: 1.1, ease: "expo.out", scrollTrigger: { trigger: "footer", start: "top 92%" } });
 }
 
 /* ================================================================
