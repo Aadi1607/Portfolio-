@@ -45,7 +45,7 @@ html{background:var(--bg);color-scheme:dark;-webkit-text-size-adjust:100%;overfl
 html.lenis,html.lenis body{height:auto}
 .lenis.lenis-smooth{scroll-behavior:auto!important}
 body{
-  background:var(--bg);color:var(--text);font-family:var(--f-display);
+  background:transparent;color:var(--text);font-family:var(--f-display);
   font-size:16px;line-height:1.6;overflow-x:clip;-webkit-font-smoothing:antialiased;
 }
 body.has-cursor,body.has-cursor a,body.has-cursor button{cursor:none}
@@ -68,7 +68,7 @@ button,input,textarea{font:inherit;color:inherit}
   opacity:.55;
 }
 .aurora{position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden}
-.aurora i{position:absolute;border-radius:50%;filter:blur(110px);opacity:.28;animation:drift 22s ease-in-out infinite alternate}
+.aurora i{position:absolute;border-radius:50%;filter:blur(110px);opacity:.2;animation:drift 22s ease-in-out infinite alternate}
 .aurora i:nth-child(1){width:46vw;height:46vw;background:#1d6bff;top:-14vw;left:-10vw}
 .aurora i:nth-child(2){width:38vw;height:38vw;background:#7a3cff;top:20vh;right:-14vw;animation-delay:-7s}
 .aurora i:nth-child(3){width:30vw;height:30vw;background:#00c2d6;bottom:-12vw;left:30vw;animation-delay:-13s;opacity:.18}
@@ -267,28 +267,39 @@ section.block{position:relative;padding:clamp(96px,14vw,170px) 0}
 .rl{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);border-bottom:1px dashed var(--line);padding-bottom:6px}
 .rl b{font-family:var(--f-mono);font-weight:500;color:var(--text)}
 
-/* ---------- cases (stacked) ---------- */
-.cases{position:relative}
-.case{position:sticky;top:110px;margin-bottom:40px;transform-origin:50% 0}
-.case-card{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);min-height:min(520px,72vh);border-radius:26px;border:1px solid var(--line-2);background:linear-gradient(160deg,#0d1424,#070b14 70%);overflow:hidden;box-shadow:0 -20px 60px -20px rgba(0,0,0,.8)}
-.case-info{padding:clamp(28px,4vw,52px);display:flex;flex-direction:column;position:relative;z-index:1}
+/* ---------- cases (horizontal gallery) ---------- */
+.cases-pin{position:relative;overflow:hidden;padding:10px 0}
+.cases{display:flex;gap:28px;width:max-content;padding:0 max(var(--gutter),calc((100vw - var(--maxw)) / 2 + var(--gutter)));will-change:transform}
+.case{flex:none;width:min(940px,74vw)}
+.case-card{position:relative;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);height:min(560px,66vh);min-height:470px;border-radius:26px;border:1px solid var(--line-2);background:linear-gradient(160deg,rgba(16,24,42,.92),rgba(7,11,20,.94) 70%);overflow:hidden;transition:box-shadow .6s}
+.case-card:hover{box-shadow:0 30px 90px -30px rgba(94,242,255,.4)}
+.case-info{padding:clamp(26px,3.2vw,44px);display:flex;flex-direction:column;position:relative;z-index:1;min-width:0}
 .case-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
-.status{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border-radius:999px;border:1px solid currentColor;font-size:10.5px;letter-spacing:.14em}
+.status{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border-radius:999px;border:1px solid currentColor;font-size:10.5px;letter-spacing:.14em;background:rgba(5,7,13,.5)}
 .status i{width:6px;height:6px;border-radius:50%;background:currentColor;animation:ping 2s infinite}
 .status.classified{color:var(--red)}
 .status.deployed{color:var(--mint)}
 .status.resolved{color:var(--cyan)}
-.case h3{font-size:clamp(28px,3.6vw,48px);font-weight:500;line-height:1.04;letter-spacing:-.035em;margin:auto 0 18px;padding-top:40px}
-.case p{color:var(--muted);font-size:16px;max-width:520px}
+.case h3{font-size:clamp(26px,2.7vw,40px);font-weight:500;line-height:1.06;letter-spacing:-.035em;margin:auto 0 16px;padding-top:28px}
+.case p{color:var(--muted);font-size:15.5px;line-height:1.65}
 .redact{position:relative;color:var(--text);white-space:nowrap}
 .redact::after{content:"";position:absolute;inset:-1px -3px;background:var(--text);transform-origin:100% 50%;transition:transform .9s var(--ease)}
 .redact.on::after{transform:scaleX(0)}
-.case .chips{margin-top:24px}
-.case-lock{display:flex;align-items:center;gap:8px;margin-top:22px;font-family:var(--f-mono);font-size:12px;color:var(--red)}
+.case .chips{margin-top:22px}
+.case-lock{display:flex;align-items:center;gap:8px;margin-top:18px;font-family:var(--f-mono);font-size:12px;color:var(--red)}
 .case-lock svg{width:14px;height:14px}
-.case-visual{position:relative;border-left:1px solid var(--line);overflow:hidden;background:radial-gradient(circle at 50% 50%,rgba(94,242,255,.08),transparent 60%)}
+.case-visual{position:relative;margin:14px;border-radius:18px;border:1px solid var(--line);overflow:hidden;background:radial-gradient(circle at 50% 45%,rgba(94,242,255,.12),rgba(5,7,13,.7) 70%)}
+.case-visual::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:32px 32px;opacity:.5;mask-image:radial-gradient(circle at 50% 50%,#000,transparent 75%);-webkit-mask-image:radial-gradient(circle at 50% 50%,#000,transparent 75%)}
 .case-visual canvas{position:absolute;inset:0;width:100%;height:100%}
-.case-num{position:absolute;right:24px;bottom:6px;font-size:clamp(90px,14vw,190px);font-weight:600;letter-spacing:-.06em;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(140,170,220,.18);pointer-events:none}
+.viz-label{position:absolute;top:14px;left:16px;right:16px;z-index:1;display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.viz-label b{color:var(--cyan);font-weight:500}
+.viz-label .rec{display:flex;align-items:center;gap:6px;color:var(--red)}
+.viz-label .rec::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 1.2s steps(1) infinite}
+.case-num{position:absolute;right:18px;bottom:0;font-size:clamp(80px,9vw,140px);font-weight:600;letter-spacing:-.06em;line-height:.85;color:transparent;-webkit-text-stroke:1px rgba(140,170,220,.2);pointer-events:none}
+.cases-foot{display:flex;align-items:center;gap:18px;margin-top:34px;font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;color:var(--dim)}
+.cases-foot b{color:var(--text);font-weight:500}
+.cases-prog{flex:1;height:1px;background:var(--line-2);position:relative;overflow:hidden}
+.cases-prog i{position:absolute;inset:0;background:var(--grad);transform-origin:0 50%;transform:scaleX(0)}
 
 /* ---------- timeline ---------- */
 .tl{position:relative;padding-left:0}
@@ -371,18 +382,79 @@ footer{position:relative;padding:60px 0 34px;border-top:1px solid var(--line);ov
 .rt-line span{color:var(--mint);white-space:nowrap}
 .rt-line input{flex:1;min-width:0;background:none;border:0;outline:none;color:var(--text);font-family:var(--f-mono);font-size:13px;caret-color:var(--cyan)}
 
+/* ---------- webgl particle world ---------- */
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:block}
+html.gl-on #globe{display:none}
+
+/* ---------- glitch ---------- */
+.hero-name{animation:glitch 7s steps(1) infinite}
+.hero-name.g-now{animation:glitch-fast .5s steps(1) 1}
+@keyframes glitch{
+  0%,90%,100%{text-shadow:none;transform:none;clip-path:none}
+  91%{text-shadow:-4px 0 rgba(255,77,109,.85),4px 0 rgba(94,242,255,.85);transform:translateX(3px) skewX(-7deg)}
+  92%{text-shadow:4px 0 rgba(255,77,109,.85),-4px 0 rgba(94,242,255,.85);transform:translateX(-5px)}
+  93%{clip-path:inset(18% 0 52% 0);transform:translateX(9px);text-shadow:-2px 0 rgba(255,77,109,.9)}
+  94%{clip-path:inset(62% 0 8% 0);transform:translateX(-7px);text-shadow:2px 0 rgba(94,242,255,.9)}
+  95%{clip-path:none;transform:none;text-shadow:none}
+}
+@keyframes glitch-fast{
+  0%{text-shadow:-5px 0 rgba(255,77,109,.9),5px 0 rgba(94,242,255,.9);transform:skewX(-10deg)}
+  20%{clip-path:inset(10% 0 60% 0);transform:translateX(10px)}
+  40%{clip-path:inset(55% 0 15% 0);transform:translateX(-10px);text-shadow:3px 0 rgba(94,242,255,.9)}
+  60%{clip-path:inset(35% 0 35% 0);transform:translateX(5px) skewX(8deg)}
+  80%{clip-path:none;text-shadow:-2px 0 rgba(255,77,109,.9);transform:none}
+  100%{text-shadow:none}
+}
+
+/* ---------- animated conic borders ---------- */
+@property --ang{syntax:"<angle>";initial-value:0deg;inherits:false}
+.case-card{position:relative}
+.case-card::before{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;padding:1px;pointer-events:none;background:conic-gradient(from var(--ang),transparent 0 62%,rgba(94,242,255,.9) 76%,rgba(139,123,255,.9) 86%,transparent 96%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 7s linear infinite}
+.term{position:relative}
+.term::before{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;padding:1px;pointer-events:none;background:conic-gradient(from var(--ang),transparent 0 70%,rgba(61,255,168,.8) 82%,rgba(94,242,255,.8) 90%,transparent 98%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 9s linear infinite}
+@keyframes spin{to{--ang:360deg}}
+.hero-cta .btn-primary{box-shadow:0 0 0 1px rgba(94,242,255,.3),0 10px 40px -8px rgba(94,242,255,.55)}
+
+/* ---------- HUD ---------- */
+.hud{position:fixed;left:0;right:0;bottom:22px;z-index:80;pointer-events:none;opacity:0;transition:opacity .6s}
+.hud.show{opacity:1}
+.hud .wrap{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase}
+.hud-l{display:flex;align-items:center;gap:12px}
+.hud-l b{color:var(--cyan);font-weight:500}
+.hud-l i{width:44px;height:1px;background:var(--line-2);position:relative;overflow:hidden}
+.hud-l i::after{content:"";position:absolute;inset:0;background:var(--cyan);transform-origin:0 50%;transform:scaleX(var(--p,0))}
+.hud-r{display:flex;gap:22px}
+.hud-r b{color:var(--text);font-weight:500}
+.hud-frame{position:fixed;inset:14px;z-index:79;pointer-events:none;opacity:0;transition:opacity .6s}
+.hud.show~.hud-frame{opacity:1}
+.hud-frame i{position:absolute;width:14px;height:14px;border:0 solid rgba(94,242,255,.45)}
+.hud-frame i:nth-child(1){top:0;left:0;border-top-width:1px;border-left-width:1px}
+.hud-frame i:nth-child(2){top:0;right:0;border-top-width:1px;border-right-width:1px}
+.hud-frame i:nth-child(3){bottom:0;left:0;border-bottom-width:1px;border-left-width:1px}
+.hud-frame i:nth-child(4){bottom:0;right:0;border-bottom-width:1px;border-right-width:1px}
+
+/* ---------- loader log ---------- */
+.loader-log{width:min(420px,86vw);height:76px;overflow:hidden;font-family:var(--f-mono);font-size:11px;line-height:19px;color:var(--muted);text-align:left;display:flex;flex-direction:column;justify-content:flex-end}
+.loader-log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.loader-log .ok{color:var(--mint)}
+
 /* ---------- responsive ---------- */
 @media (max-width:1000px){
   .nav-pill,.nav-cta{display:none}
   .nav-toggle{display:block}
   #globe{right:auto;left:50%;top:38%;width:130vw;max-width:none;transform:translate(-50%,-50%);opacity:.45}
   .ops-feed{display:none}
+  .hud,.hud-frame{display:none}
   .about-grid{grid-template-columns:1fr}
   .portrait{max-width:420px}
   .bento{grid-template-columns:1fr}
   .bento .glass{grid-column:auto!important;grid-row:auto!important}
-  .case-card{grid-template-columns:1fr}
-  .case-visual{display:none}
+  .cases{flex-direction:column;width:auto;padding:0 var(--gutter);gap:22px}
+  .case{width:auto}
+  .case-card{grid-template-columns:1fr;height:auto;min-height:0}
+  .case-visual{height:230px;order:-1;margin:12px 12px 0}
+  .case h3{margin-top:0;padding-top:22px}
+  .cases-foot{display:none}
   .certs{grid-template-columns:repeat(2,minmax(0,1fr))}
   .contact-grid{grid-template-columns:1fr}
   .sec-head{grid-template-columns:1fr}
@@ -398,7 +470,6 @@ footer{position:relative;padding:60px 0 34px;border-top:1px solid var(--line);ov
   .certs{grid-template-columns:1fr}
   .facts{grid-template-columns:1fr}
   .radar-legend{grid-template-columns:1fr}
-  .case{top:84px}
   .hero-meta{gap:20px}
   .scroll-hint{display:none}
   .btn{padding:14px 20px}
@@ -414,6 +485,7 @@ footer{position:relative;padding:60px 0 34px;border-top:1px solid var(--line);ov
 
 <div class="bg-grid" aria-hidden="true"></div>
 <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<canvas id="gl" aria-hidden="true"></canvas>
 <div class="noise" aria-hidden="true"></div>
 <div id="progress" aria-hidden="true"></div>
 <div class="cursor cursor-ring" aria-hidden="true"></div>
@@ -432,6 +504,7 @@ footer{position:relative;padding:60px 0 34px;border-top:1px solid var(--line);ov
     <div class="loader-pct"><span id="loader-num">00</span><small>%</small></div>
     <div class="loader-bar"><i id="loader-bar"></i></div>
     <div class="loader-hash" id="loader-hash">sha256 —</div>
+    <div class="loader-log" id="loader-log"></div>
   </div>
   <div class="loader-skip">CLICK TO SKIP</div>
 </div>
@@ -571,7 +644,10 @@ footer{position:relative;padding:60px 0 34px;border-top:1px solid var(--line);ov
       </div>
       <p class="sec-aside">Selected engagements &amp; research. Client work is described at a high level for confidentiality — deeper detail available on request.</p>
     </div>
+  </div>
+  <div class="cases-pin" id="cases-pin">
     <div class="cases" id="cases"></div>
+    <div class="wrap cases-foot"><b id="cases-count">01 / 04</b><div class="cases-prog"><i id="cases-prog"></i></div><span>Keep scrolling →</span></div>
   </div>
 </section>
 
@@ -651,6 +727,14 @@ footer{position:relative;padding:60px 0 34px;border-top:1px solid var(--line);ov
   </div>
 </footer>
 
+<div class="hud" id="hud" aria-hidden="true">
+  <div class="wrap">
+    <div class="hud-l"><b id="hud-idx">00</b><i id="hud-bar"></i><span id="hud-name">Home</span></div>
+    <div class="hud-r"><span>18.5204° N · 73.8567° E</span><span>Scroll <b id="hud-pct">000</b>%</span></div>
+  </div>
+</div>
+<div class="hud-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
 <!-- ============ ROOT TERMINAL ============ -->
 <div id="root-term" aria-hidden="true">
   <div class="term" role="dialog" aria-label="Root terminal">
@@ -663,6 +747,7 @@ footer{position:relative;padding:60px 0 34px;border-top:1px solid var(--line);ov
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* ================================================================
    CONTENT — edit freely
@@ -729,6 +814,8 @@ const CERTS = [
   { title:"CEH", sub:"Training complete — certification pending", pending:true },
   { title:"CCNA", sub:"Training complete — certification pending", pending:true },
 ];
+
+const VIZ_LABELS = { web: "Entity graph", face: "Face match", crawl: "Crawl queue", scan: "Threat scan" };
 
 const STATS = [
   { num:6, suffix:"", lbl:"Certifications & trainings" },
@@ -822,7 +909,7 @@ function render() {
   $("#cases").innerHTML = CASES.map((c, i) => {
     let desc = c.desc.replace(/\[([^\]]+)\]/g, '<span class="redact">$1</span>');
     return `
-    <article class="case" style="top:calc(${window.innerWidth < 640 ? 84 : 110}px + ${i * 14}px)">
+    <article class="case">
       <div class="case-card">
         <div class="case-info">
           <div class="case-top"><span>CASE #00${i + 1}</span><span class="status ${c.status}"><i></i>${c.label.toUpperCase()}</span></div>
@@ -831,7 +918,7 @@ function render() {
           <div class="chips">${c.tags.map(t => `<span class="chip">${t}</span>`).join("")}</div>
           ${c.confidential ? `<div class="case-lock">${ICONS.lock}Details confidential — available on request</div>` : ""}
         </div>
-        <div class="case-visual"><canvas data-viz="${c.viz}"></canvas><div class="case-num">0${i + 1}</div></div>
+        <div class="case-visual"><span class="viz-label"><span>Visual // <b>${VIZ_LABELS[c.viz]}</b></span><span class="rec">Live</span></span><canvas data-viz="${c.viz}"></canvas><div class="case-num">0${i + 1}</div></div>
       </div>
     </article>`;
   }).join("");
@@ -988,6 +1075,214 @@ function initGlobe() {
 }
 
 /* ================================================================
+   WEBGL PARTICLE WORLD — one cloud that morphs per section
+   globe → fingerprint → neural knot → padlock → DNA → shield → galaxy
+   ================================================================ */
+let GL = null;
+function initGL() {
+  if (REDUCED || !window.THREE) return null;
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: $("#gl"), alpha: true, antialias: false, powerPreference: "high-performance" }); }
+  catch (e) { return null; }
+  const MOBILE = innerWidth < 760;
+  const N = MOBILE ? 6500 : 15000;
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
+  renderer.setSize(innerWidth, innerHeight, false);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, .1, 100);
+  camera.position.z = 7;
+
+  const R = Math.random, TAU = Math.PI * 2;
+  const gauss = () => (R() + R() + R() - 1.5) / 1.5;
+  const rotX = (p, a) => [p[0], p[1] * Math.cos(a) - p[2] * Math.sin(a), p[1] * Math.sin(a) + p[2] * Math.cos(a)];
+  const rotZ = (p, a) => [p[0] * Math.cos(a) - p[1] * Math.sin(a), p[0] * Math.sin(a) + p[1] * Math.cos(a), p[2]];
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  const shieldW = y => 1.2 * Math.pow(Math.max(0, Math.cos(Math.min(1, (1.3 - y) / 3.05) * Math.PI / 2)), .8);
+
+  const SHAPES = {
+    scatter: () => { const u = R() * TAU, v = Math.acos(2 * R() - 1), r = 6 + R() * 6; return [Math.sin(v) * Math.cos(u) * r, Math.sin(v) * Math.sin(u) * r, Math.cos(v) * r]; },
+    globe: (i) => {
+      const M = Math.floor(N * .8);
+      if (i < M) { const y = 1 - 2 * i / (M - 1), r = Math.sqrt(1 - y * y), th = golden * i; return [Math.cos(th) * r * 1.55, y * 1.55, Math.sin(th) * r * 1.55]; }
+      const a = R() * TAU, rr = (i % 2 ? 2.1 : 2.45) + gauss() * .03;
+      return rotZ(rotX([Math.cos(a) * rr, gauss() * .02, Math.sin(a) * rr], i % 2 ? .5 : -.25), .25);
+    },
+    fingerprint: (i) => {
+      const k = 1 + (i % 17); let a = R() * TAU;
+      for (let t = 0; t < 6 && Math.sin(a * 3 + k * 1.7) > .82; t++) a = R() * TAU;
+      const d = 1 + .045 * Math.sin(a * 5 + k);
+      return [Math.cos(a) * .1 * k * d, Math.sin(a) * .13 * k * d - .1, gauss() * .05];
+    },
+    knot: () => {
+      const t = R() * TAU, r = Math.cos(3 * t) + 2;
+      return [r * Math.cos(2 * t) * .58 + gauss() * .14, r * Math.sin(2 * t) * .58 + gauss() * .14, -Math.sin(3 * t) * .58 + gauss() * .14];
+    },
+    lock: () => {
+      const u = R();
+      if (u < .3) {
+        const tr = .13, ph = R() * TAU;
+        if (R() < .25) { const sx = R() < .5 ? -1 : 1; return [sx * .72 + Math.cos(ph) * tr, .05 + R() * .35, Math.sin(ph) * tr]; }
+        const a = R() * Math.PI, rr = .72 + Math.cos(ph) * tr;
+        return [Math.cos(a) * rr, .4 + Math.sin(a) * rr * 1.1, Math.sin(ph) * tr];
+      }
+      const w = 2.1, h = 1.6, d = .55, cy = -.55;
+      if (R() < .72) {
+        let x = (R() - .5) * w, y = cy + (R() - .5) * h, z = R() < .5 ? d / 2 : -d / 2;
+        const hole = Math.hypot(x, y + .4) < .2 || (Math.abs(x) < .07 && y < -.4 && y > -.9);
+        if (hole && z > 0) z = -d / 2;
+        return [x, y, z];
+      }
+      return R() < .5 ? [(R() < .5 ? -1 : 1) * w / 2, cy + (R() - .5) * h, (R() - .5) * d] : [(R() - .5) * w, cy + (R() < .5 ? -1 : 1) * h / 2, (R() - .5) * d];
+    },
+    helix: (i) => {
+      let x = (R() - .5) * 6.6;
+      if (R() < .78) { const ang = x * 2.1 + (i % 2) * Math.PI; return rotZ([x, Math.cos(ang) * .8 + gauss() * .04, Math.sin(ang) * .8 + gauss() * .04], -.3); }
+      x = Math.round(x / .3) * .3; const ang = x * 2.1, f = R() * 2 - 1;
+      return rotZ([x, Math.cos(ang) * .8 * f, Math.sin(ang) * .8 * f], -.3);
+    },
+    shield: () => {
+      const u = R();
+      if (u < .62) {
+        const sc = u < .38 ? 1 : .8, j = () => gauss() * .035;
+        if (R() < .22) { const x = (R() * 2 - 1) * 1.2; return [x * sc + j(), (1.3 + .1 * (x / 1.2) ** 2) * sc + j() - (1 - sc) * .2, gauss() * .07]; }
+        const y = 1.3 - R() * 3.05, sx = R() < .5 ? -1 : 1;
+        return [sx * shieldW(y) * sc + j(), y * sc + j() - (1 - sc) * .2, gauss() * .07];
+      }
+      if (u < .8) {
+        const P = [[-.5, 0], [-.12, -.42], [.62, .5]], seg = R() < .35 ? 0 : 1, t = R();
+        return [P[seg][0] + (P[seg + 1][0] - P[seg][0]) * t + gauss() * .04, P[seg][1] + (P[seg + 1][1] - P[seg][1]) * t + gauss() * .04, gauss() * .05];
+      }
+      for (;;) { const y = 1.3 - R() * 3.05, x = (R() * 2 - 1) * 1.2; if (Math.abs(x) < shieldW(y)) return [x, y, gauss() * .03]; }
+    },
+    galaxy: (i) => {
+      if (R() < .14) return rotX([gauss() * .35, gauss() * .25, gauss() * .35], .95);
+      const r = Math.pow(R(), 1.5) * 3.1, ang = (i % 3) * TAU / 3 + r * 1.7 + gauss() * .32 / (r * .5 + .35);
+      return rotX([Math.cos(ang) * r, gauss() * .1 * (1 - r / 3.4), Math.sin(ang) * r], .95);
+    },
+  };
+  const cache = {};
+  const build = name => {
+    if (cache[name]) return cache[name];
+    const a = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) { const p = SHAPES[name](i); a[i * 3] = p[0]; a[i * 3 + 1] = p[1]; a[i * 3 + 2] = p[2]; }
+    return (cache[name] = a);
+  };
+
+  const from = build("scatter").slice(), to = build("globe").slice(), rnd = new Float32Array(N);
+  for (let i = 0; i < N; i++) rnd[i] = R();
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(to, 3));
+  geo.setAttribute("aFrom", new THREE.BufferAttribute(from, 3));
+  geo.setAttribute("aRand", new THREE.BufferAttribute(rnd, 1));
+
+  const uniforms = {
+    uMix: { value: 0 }, uTime: { value: 0 }, uOpacity: { value: 0 },
+    uSize: { value: (MOBILE ? 2.6 : 2.2) * renderer.getPixelRatio() },
+    uMouse: { value: new THREE.Vector3(99, 99, 0) },
+  };
+  const mat = new THREE.ShaderMaterial({
+    uniforms, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `
+      attribute vec3 aFrom; attribute float aRand;
+      uniform float uMix, uTime, uSize; uniform vec3 uMouse;
+      varying vec3 vCol; varying float vA;
+      void main(){
+        float t = clamp(uMix * 1.4 - aRand * .4, 0., 1.);
+        t = t * t * (3. - 2. * t);
+        vec3 p = mix(aFrom, position, t);
+        float burst = sin(t * 3.14159);
+        p += burst * vec3(sin(aRand * 40. + uTime), cos(aRand * 31. + uTime * .8), sin(aRand * 23. - uTime)) * .9;
+        p += vec3(sin(uTime * .7 + aRand * 20.), cos(uTime * .6 + aRand * 17.), 0.) * .018;
+        vec4 wp = modelMatrix * vec4(p, 1.);
+        vec2 dir = wp.xy - uMouse.xy; float dl = length(dir);
+        wp.xy += normalize(dir + 1e-4) * smoothstep(1.3, 0., dl) * .55;
+        vec4 mv = viewMatrix * wp;
+        gl_Position = projectionMatrix * mv;
+        gl_PointSize = uSize * (.55 + aRand * .9) * (7. / -mv.z);
+        vec3 cyan = vec3(.37, .95, 1.), vio = vec3(.55, .48, 1.), pink = vec3(1., .3, .43);
+        vCol = mix(cyan, vio, clamp(aRand * .7 + p.y * .18 + .15, 0., 1.));
+        if (aRand > .975) vCol = pink;
+        vA = .55 + .45 * smoothstep(-1.5, 1.5, -mv.z * -.0 + p.z) + burst * .3;
+      }`,
+    fragmentShader: `
+      uniform float uOpacity; varying vec3 vCol; varying float vA;
+      void main(){
+        float d = length(gl_PointCoord - .5);
+        float a = smoothstep(.5, .05, d);
+        gl_FragColor = vec4(vCol * (1. + smoothstep(.2, 0., d) * .8), a * vA * uOpacity);
+      }`,
+  });
+  const pts = new THREE.Points(geo, mat);
+  pts.frustumCulled = false;
+  const group = new THREE.Group();
+  group.add(pts); scene.add(group);
+
+  const SCENES = {
+    hero:    { s: "globe",       x: MOBILE ? 0 : 2.15, y: MOBILE ? 1.15 : 0, sc: MOBILE ? .72 : 1,   op: MOBILE ? .75 : 1 },
+    about:   { s: "fingerprint", x: MOBILE ? 0 : 2.6,  y: 0,                 sc: MOBILE ? .7 : .95,  op: .36 },
+    skills:  { s: "knot",        x: 0,                 y: 0,                 sc: MOBILE ? .6 : 1,    op: .38 },
+    work:    { s: "lock",        x: 0,                 y: .1,                sc: MOBILE ? .75 : 1.35, op: .3 },
+    journey: { s: "helix",       x: 0,                 y: 0,                 sc: MOBILE ? .55 : 1.1, op: .3 },
+    certs:   { s: "shield",      x: 0,                 y: 0,                 sc: MOBILE ? .75 : 1.2, op: .35 },
+    contact: { s: "galaxy",      x: MOBILE ? 0 : 2.3,  y: MOBILE ? -.6 : 0,  sc: MOBILE ? .7 : 1,    op: .6 },
+  };
+  let current = "globe";
+  group.position.set(SCENES.hero.x, SCENES.hero.y, 0);
+  group.scale.setScalar(SCENES.hero.sc);
+
+  function morphTo(name) {
+    if (name === current) return;
+    current = name;
+    const m = uniforms.uMix.value, target = build(name);
+    for (let i = 0; i < N; i++) {
+      let t = Math.min(1, Math.max(0, m * 1.4 - rnd[i] * .4)); t = t * t * (3 - 2 * t);
+      for (let k = 0; k < 3; k++) { const j = i * 3 + k; from[j] = from[j] + (to[j] - from[j]) * t; }
+    }
+    to.set(target);
+    geo.attributes.position.needsUpdate = true; geo.attributes.aFrom.needsUpdate = true;
+    uniforms.uMix.value = 0;
+    gsap.to(uniforms.uMix, { value: 1, duration: 1.9, ease: "power2.inOut", overwrite: true });
+  }
+  function go(id) {
+    const c = SCENES[id]; if (!c) return;
+    morphTo(c.s);
+    gsap.to(group.position, { x: c.x, y: c.y, duration: 1.8, ease: "power3.inOut", overwrite: true });
+    gsap.to(group.scale, { x: c.sc, y: c.sc, z: c.sc, duration: 1.8, ease: "power3.inOut", overwrite: true });
+    gsap.to(uniforms.uOpacity, { value: c.op, duration: 1.2, overwrite: true });
+  }
+  function intro() {
+    gsap.to(uniforms.uMix, { value: 1, duration: 2.8, ease: "power3.inOut" });
+    gsap.to(uniforms.uOpacity, { value: SCENES.hero.op, duration: 1.4 });
+  }
+
+  const ndc = new THREE.Vector2(9, 9), tmp = new THREE.Vector3();
+  let tiltX = 0, tiltY = 0;
+  if (!TOUCH) addEventListener("mousemove", e => { ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); });
+  addEventListener("resize", () => {
+    camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight, false);
+  });
+  const clock = new THREE.Clock();
+  (function loop() {
+    const dt = Math.min(clock.getDelta(), .05);
+    uniforms.uTime.value += dt;
+    if (ndc.x < 2) {
+      tmp.set(ndc.x, ndc.y, .5).unproject(camera).sub(camera.position).normalize();
+      uniforms.uMouse.value.copy(camera.position).add(tmp.multiplyScalar(-camera.position.z / tmp.z));
+    }
+    tiltX += ((ndc.x < 2 ? ndc.y : 0) * .25 - tiltX) * .04;
+    tiltY += ((ndc.x < 2 ? ndc.x : 0) * .35 - tiltY) * .04;
+    pts.rotation.y += dt * (current === "helix" ? .5 : .14);
+    group.rotation.x = -tiltX + (current === "globe" ? .25 : 0);
+    group.rotation.y = tiltY;
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  })();
+  document.documentElement.classList.add("gl-on");
+  return { go, intro };
+}
+
+/* ================================================================
    CASE VISUALS — small generative canvases per project
    ================================================================ */
 function initCaseViz() {
@@ -1120,6 +1415,8 @@ function initTilt() {
     el.addEventListener("mouseleave", () => { el.style.transition = "transform .8s cubic-bezier(.22,1,.36,1)"; el.style.transform = ""; setTimeout(() => el.style.transition = "", 800); });
   });
 }
+const SECTIONS = ["hero", "about", "skills", "work", "journey", "certs", "contact"];
+const SECTION_NAMES = ["Home", "Identity", "Arsenal", "Case Files", "Journey", "Credentials", "Handshake"];
 function initNav() {
   const links = $$(".nav-pill a"), ind = $("#nav-ind");
   const move = a => {
@@ -1133,9 +1430,19 @@ function initNav() {
       const a = links.find(l => l.getAttribute("href") === "#" + e.target.id);
       links.forEach(l => l.classList.toggle("active", l === a));
       move(a);
+      const idx = SECTIONS.indexOf(e.target.id);
+      $("#hud-idx").textContent = String(idx).padStart(2, "0");
+      scramble($("#hud-name"), SECTION_NAMES[idx], 500);
+      $("#hud").classList.toggle("show", idx > 0);
     });
   }, { rootMargin: "-45% 0px -50% 0px" });
-  ["hero", "about", "skills", "work", "journey", "certs", "contact"].forEach(id => io.observe(document.getElementById(id)));
+  SECTIONS.forEach(id => io.observe(document.getElementById(id)));
+  links.forEach(l => { const t = l.textContent; l.addEventListener("mouseenter", () => scramble(l, t, 380)); });
+  addEventListener("scroll", () => {
+    const p = scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    $("#hud-pct").textContent = String(Math.round(p * 100)).padStart(3, "0");
+    $("#hud-bar").style.setProperty("--p", p);
+  }, { passive: true });
 
   const tog = $(".nav-toggle"), menu = $("#mobile-menu");
   tog.addEventListener("click", () => {
@@ -1201,6 +1508,9 @@ function initScroll() {
     return;
   }
 
+  if (GL) SECTIONS.forEach(id => ScrollTrigger.create({ trigger: "#" + id, start: "top 55%", end: "bottom 55%", onToggle: st => st.isActive && GL.go(id) }));
+  $$(".sec-label").forEach(el => { const t = el.textContent; ScrollTrigger.create({ trigger: el, start: "top 90%", once: true, onEnter: () => scramble(el, t, 900) }); });
+
   // hero parallax out
   gsap.to(".hero-inner", { yPercent: -18, opacity: 0, ease: "none", scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true } });
   gsap.to("#globe", { scale: .8, opacity: .25, ease: "none", scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true } });
@@ -1229,15 +1539,32 @@ function initScroll() {
   gsap.to("#radar-sweep", { rotation: 360, svgOrigin: "0 0", duration: 5, ease: "none", repeat: -1 });
   gsap.from(".rl", { opacity: 0, x: -14, stagger: .05, duration: .6, scrollTrigger: { trigger: "#radar-legend", start: "top 92%" } });
 
-  // stacked cases
-  const cases = $$(".case");
-  cases.forEach((c, i) => {
-    gsap.from(c.querySelector(".case-card"), { y: 120, opacity: 0, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: c, start: "top 92%" } });
-    ScrollTrigger.create({ trigger: c, start: "top 60%", once: true, onEnter: () => $$(".redact", c).forEach((r, k) => setTimeout(() => r.classList.add("on"), 400 + k * 300)) });
-    if (i < cases.length - 1) {
-      gsap.to(c.querySelector(".case-card"), { scale: .9 + i * .02, filter: "brightness(.55)", ease: "none",
-        scrollTrigger: { trigger: cases[i + 1], start: "top bottom", end: "top 20%", scrub: true } });
-    }
+  // case files — pinned horizontal gallery on desktop, vertical list on mobile
+  const track = $("#cases"), cards = $$(".case"), count = $("#cases-count");
+  const reveal = c => $$(".redact", c).forEach((r, k) => setTimeout(() => r.classList.add("on"), 300 + k * 300));
+  const mm = gsap.matchMedia();
+  mm.add("(min-width: 1001px)", () => {
+    const dist = () => track.scrollWidth - innerWidth;
+    const tw = gsap.to(track, { x: () => -dist(), ease: "none",
+      scrollTrigger: { trigger: "#cases-pin", start: "center center", end: () => "+=" + dist(), pin: true, scrub: 1, invalidateOnRefresh: true, anticipatePin: 1,
+        onUpdate: st => {
+          $("#cases-prog").style.transform = `scaleX(${st.progress})`;
+          count.textContent = `0${1 + Math.round(st.progress * (cards.length - 1))} / 0${cards.length}`;
+        } } });
+    gsap.from(cards, { y: 90, opacity: 0, duration: 1.2, stagger: .1, ease: "expo.out", scrollTrigger: { trigger: "#cases-pin", start: "top 85%" } });
+    ScrollTrigger.create({ trigger: "#cases-pin", start: "top 60%", once: true, onEnter: () => reveal(cards[0]) });
+    cards.forEach((c, i) => {
+      if (!i) return;
+      gsap.fromTo(c.querySelector(".case-card"), { scale: .86, rotateY: -14, opacity: .4, transformPerspective: 1400 },
+        { scale: 1, rotateY: 0, opacity: 1, ease: "none", scrollTrigger: { trigger: c, containerAnimation: tw, start: "left 100%", end: "left 40%", scrub: true } });
+      ScrollTrigger.create({ trigger: c, containerAnimation: tw, start: "left 65%", once: true, onEnter: () => reveal(c) });
+    });
+  });
+  mm.add("(max-width: 1000px)", () => {
+    cards.forEach(c => {
+      gsap.from(c, { y: 80, opacity: 0, duration: 1.1, ease: "expo.out", scrollTrigger: { trigger: c, start: "top 90%" } });
+      ScrollTrigger.create({ trigger: c, start: "top 65%", once: true, onEnter: () => reveal(c) });
+    });
   });
 
   // timeline
@@ -1256,6 +1583,9 @@ function initScroll() {
   gsap.from(".c-link", { opacity: 0, x: -30, stagger: .08, duration: 1, ease: "expo.out", scrollTrigger: { trigger: ".c-links", start: "top 85%" } });
   gsap.from("#contact .term", { opacity: 0, y: 60, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: "#contact .term", start: "top 88%" } });
 
+  ScrollTrigger.sort();
+  ScrollTrigger.refresh();
+
   // footer sweep
   gsap.fromTo("#foot-name", { "--fx": "-40%" }, { "--fx": "140%", ease: "none", scrollTrigger: { trigger: "footer", start: "top bottom", end: "bottom bottom", scrub: true } });
 }
@@ -1264,7 +1594,11 @@ function initScroll() {
    HERO INTRO
    ================================================================ */
 function heroIntro() {
+  const hn = $(".hero-name");
+  hn.addEventListener("mouseenter", () => { hn.classList.remove("g-now"); void hn.offsetWidth; hn.classList.add("g-now"); });
+  hn.addEventListener("animationend", e => { if (e.animationName === "glitch-fast") hn.classList.remove("g-now"); });
   if (!GSAP_OK || REDUCED) return;
+  if (GL) GL.intro();
   const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
   tl.fromTo(".hero-name .ch", { yPercent: 115, rotate: 8 }, { yPercent: 0, rotate: 0, duration: 1.4, stagger: .035 })
     .fromTo(".reveal-hero", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.2, stagger: .1 }, "-=1.1")
@@ -1288,6 +1622,9 @@ function preloader(done) {
   let finished = false;
   const o = { v: 0 };
   const hashInt = setInterval(() => hash.textContent = "sha256 " + randHex(32), 60);
+  const log = $("#loader-log");
+  ["mounting encrypted volume", "loading threat-intel modules", "handshake with 7 relay nodes", "verifying operator signature"].forEach((t, i) =>
+    setTimeout(() => { if (!finished) log.insertAdjacentHTML("beforeend", `<div>› ${t} ${".".repeat(28 - t.length)} <span class="ok">ok</span></div>`); }, 250 + i * 400));
   const run = gsap.to(o, { v: 100, duration: 1.9, ease: "power2.inOut",
     onUpdate: () => { num.textContent = String(Math.round(o.v)).padStart(2, "0"); bar.style.transform = `scaleX(${o.v / 100})`; },
     onComplete: finish });
@@ -1384,7 +1721,8 @@ initCursor();
 initSpotlight();
 initForm();
 initRootTerm();
-initGlobe();
+if (GSAP_OK) GL = initGL();
+if (!GL) initGlobe();
 initCaseViz();
 preloader(() => {
   initLenis();
