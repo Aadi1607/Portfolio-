@@ -494,6 +494,111 @@ html.gl-on #globe{display:none}
   .about-lead .w{opacity:1}
   .noise{display:none}
 }
+/* ---------- team ---------- */
+.team-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:24px;
+}
+.team-card{
+  position:relative;
+  border-radius:20px;
+  border:1px solid var(--line-2);
+  background:rgba(10,15,26,.55);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  overflow:hidden;
+  padding:28px 24px 24px;
+  transition:transform .5s var(--ease),box-shadow .5s var(--ease),border-color .5s;
+  cursor:default;
+  isolation:isolate;
+}
+.team-card::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius:inherit;
+  background:conic-gradient(from var(--angle,0deg),transparent 60%,var(--accent-col,var(--cyan)) 80%,transparent 100%);
+  z-index:-1;
+  opacity:0;
+  transition:opacity .5s;
+}
+.team-card:hover::before{opacity:1;animation:spin-border 2.4s linear infinite}
+@property --angle{syntax:"<angle>";initial-value:0deg;inherits:false}
+@keyframes spin-border{to{--angle:360deg}}
+.team-card:hover{
+  transform:translateY(-8px) scale(1.015);
+  box-shadow:0 32px 64px -20px rgba(0,0,0,.7),0 0 60px -20px var(--accent-col,var(--cyan));
+  border-color:transparent;
+}
+.team-card .tc-glow{
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:radial-gradient(circle at 50% 0%,var(--accent-col,var(--cyan)) 0%,transparent 65%);
+  opacity:0;
+  transition:opacity .5s;
+  pointer-events:none;
+  mix-blend-mode:screen;
+}
+.team-card:hover .tc-glow{opacity:.08}
+.tc-avatar{
+  width:72px;height:72px;
+  border-radius:50%;
+  margin-bottom:16px;
+  border:2px solid var(--line-2);
+  display:grid;place-items:center;
+  font-size:28px;
+  background:var(--panel-solid);
+  position:relative;
+  overflow:hidden;
+  transition:border-color .4s,box-shadow .4s;
+}
+.team-card:hover .tc-avatar{
+  border-color:var(--accent-col,var(--cyan));
+  box-shadow:0 0 24px -4px var(--accent-col,var(--cyan));
+}
+.tc-avatar .scan-v{
+  position:absolute;top:-100%;left:0;right:0;height:40%;
+  background:linear-gradient(to bottom,transparent,rgba(94,242,255,.22),transparent);
+  animation:scan-v 2.8s ease-in-out infinite;
+}
+@keyframes scan-v{0%{top:-40%}100%{top:140%}}
+.tc-role-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  padding:4px 10px;border-radius:999px;
+  border:1px solid var(--accent-col,var(--cyan));
+  color:var(--accent-col,var(--cyan));
+  background:rgba(94,242,255,.06);
+  margin-bottom:12px;
+}
+.tc-role-badge::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent-col,var(--cyan));animation:ping 2s infinite}
+.tc-name{font-size:19px;font-weight:600;letter-spacing:-.025em;margin-bottom:4px}
+.tc-title{font-size:13px;color:var(--muted);margin-bottom:16px;font-family:var(--f-mono)}
+.tc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.tc-tag{font-family:var(--f-mono);font-size:10px;padding:3px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--dim)}
+.tc-stat-row{display:flex;gap:16px;padding-top:16px;border-top:1px solid var(--line)}
+.tc-stat{flex:1}
+.tc-stat .n{font-family:var(--f-mono);font-size:18px;font-weight:600;color:var(--text);letter-spacing:-.02em}
+.tc-stat .l{font-family:var(--f-mono);font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);margin-top:2px}
+.tc-links{position:absolute;top:20px;right:20px;display:flex;gap:8px}
+.tc-link{width:30px;height:30px;display:grid;place-items:center;border-radius:8px;border:1px solid var(--line-2);color:var(--muted);transition:color .3s,border-color .3s,background .3s}
+.tc-link:hover{color:var(--accent-col,var(--cyan));border-color:var(--accent-col,var(--cyan));background:rgba(94,242,255,.08)}
+.tc-link svg{width:13px;height:13px}
+/* data-v animation countdown pip */
+.tc-id{
+  position:absolute;bottom:0;left:0;right:0;
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.16em;
+  color:var(--dim);text-align:center;
+  padding:8px;
+  border-top:1px solid var(--line);
+  background:rgba(5,7,13,.4);
+  opacity:0;transition:opacity .4s;
+}
+.team-card:hover .tc-id{opacity:1}
+
+@media(max-width:600px){.team-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -538,6 +643,7 @@ html.gl-on #globe{display:none}
       <a href="#work">Case Files</a>
       <a href="#journey">Journey</a>
       <a href="#certs">Credentials</a>
+      <a href="#team">Team</a>
       <a href="#contact">Contact</a>
     </nav>
     <div class="nav-cta"><span class="live-dot"></span><span id="clock">IST --:--:--</span></div>
@@ -550,7 +656,8 @@ html.gl-on #globe{display:none}
   <a href="#work"><span>03</span>Case Files</a>
   <a href="#journey"><span>04</span>Journey</a>
   <a href="#certs"><span>05</span>Credentials</a>
-  <a href="#contact"><span>06</span>Contact</a>
+  <a href="#team"><span>06</span>Team</a>
+  <a href="#contact"><span>07</span>Contact</a>
 </div>
 
 <main>
@@ -696,10 +803,24 @@ html.gl-on #globe{display:none}
   </div>
 </section>
 
+<!-- ============ TEAM ============ -->
+<section id="team" class="block">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="sec-label">06 — Strike Team</div>
+        <h2 class="sec-title"><span class="ln"><span>The</span></span><span class="ln"><span><span class="serif grad-text">operators.</span></span></span></h2>
+      </div>
+      <p class="sec-aside">The crew behind the ops — elite specialists in every layer of the cyber kill-chain.</p>
+    </div>
+    <div class="team-grid" id="team-grid"></div>
+  </div>
+</section>
+
 <!-- ============ CONTACT ============ -->
 <section id="contact" class="block">
   <div class="wrap">
-    <div class="sec-label">06 — Handshake</div>
+    <div class="sec-label">07 — Handshake</div>
     <h2 class="contact-big"><span class="ln"><span>Let's secure</span></span><span class="ln"><span><span class="serif grad-text">what matters.</span></span></span></h2>
     <div class="contact-grid">
       <div>
@@ -744,7 +865,7 @@ html.gl-on #globe{display:none}
       <nav class="foot-nav" aria-label="Footer">
         <a href="#about">About</a><a href="#work">Case Files</a>
         <a href="#skills">Arsenal</a><a href="#journey">Journey</a>
-        <a href="#certs">Credentials</a><a href="#contact">Contact</a>
+        <a href="#certs">Credentials</a><a href="#team">Team</a><a href="#contact">Contact</a>
       </nav>
       <div class="foot-social">
         <a href="https://www.linkedin.com/in/aaditya-chaudhari-20324a240" target="_blank" rel="noopener" aria-label="LinkedIn" data-magnetic><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1V21h-4v-5.1c0-1.22-.02-2.78-1.7-2.78-1.7 0-1.96 1.33-1.96 2.7V21h-4z"/></svg></a>
@@ -1747,6 +1868,104 @@ function initRootTerm() {
 /* ================================================================
    BOOT
    ================================================================ */
+/* ================================================================
+   TEAM
+   ================================================================ */
+const TEAM = [
+  {
+    emoji:"🛡️", name:"Aaditya Chaudhari", handle:"@aaditya",
+    title:"Lead Security Engineer · AI Threat Intel",
+    role:"COMMANDER", accent:"#5ef2ff",
+    tags:["OSINT","LLMs","MITRE ATT&CK","Digital Forensics"],
+    stats:[{n:"M.Tech",l:"Degree"},{n:"8.66",l:"CGPA"},{n:"4+",l:"Projects"}],
+    id:"SUBJECT-0x4A · CLEARED"
+  },
+  {
+    emoji:"🔍", name:"Riya Sharma", handle:"@r.sharma",
+    title:"OSINT Specialist · Dark-Web Intel",
+    role:"ANALYST", accent:"#8b7bff",
+    tags:["OSINT","Maltego","Shodan","Threat Mapping"],
+    stats:[{n:"500+",l:"Sources"},{n:"3yr",l:"Field"},{n:"12",l:"Reports"}],
+    id:"SUBJECT-0x1B · CLEARED"
+  },
+  {
+    emoji:"⚡", name:"Karan Mehta", handle:"@k.mehta",
+    title:"Penetration Tester · Red Team Lead",
+    role:"RED TEAM", accent:"#ff4d6d",
+    tags:["Metasploit","Burp Suite","CVE Research","C2 Ops"],
+    stats:[{n:"80+",l:"Vulns Found"},{n:"15",l:"Engagements"},{n:"CVE-5",l:"Reported"}],
+    id:"SUBJECT-0x2C · CLEARED"
+  },
+  {
+    emoji:"🤖", name:"Priya Nair", handle:"@p.nair",
+    title:"AI Security Researcher · Adversarial ML",
+    role:"RESEARCHER", accent:"#3dffa8",
+    tags:["PyTorch","Adversarial ML","LLM Safety","ATLAS"],
+    stats:[{n:"6",l:"Papers"},{n:"2",l:"Grants"},{n:"3yr",l:"Research"}],
+    id:"SUBJECT-0x3D · CLEARED"
+  },
+  {
+    emoji:"🔐", name:"Dev Kulkarni", handle:"@d.kulkarni",
+    title:"Cryptography Engineer · Zero-Trust Arch",
+    role:"CRYPTOGRAPHER", accent:"#ffc65e",
+    tags:["AES-256","PKI","Zero-Trust","Rust"],
+    stats:[{n:"12",l:"Protocols"},{n:"4",l:"Patents"},{n:"99.9%",l:"Uptime"}],
+    id:"SUBJECT-0x4E · CLEARED"
+  },
+  {
+    emoji:"🕵️", name:"Sneha Patil", handle:"@s.patil",
+    title:"Malware Analyst · Reverse Engineer",
+    role:"FORENSICS", accent:"#d77bff",
+    tags:["IDA Pro","YARA","Ghidra","Memory Forensics"],
+    stats:[{n:"200+",l:"Samples"},{n:"5",l:"APTs Tracked"},{n:"CTF-3",l:"Wins"}],
+    id:"SUBJECT-0x5F · CLEARED"
+  },
+];
+
+function initTeam() {
+  const grid = document.getElementById("team-grid");
+  if (!grid) return;
+  grid.innerHTML = TEAM.map(m => `
+    <article class="team-card" style="--accent-col:${m.accent}">
+      <div class="tc-glow"></div>
+      <div class="tc-links">
+        <a href="#" class="tc-link" aria-label="GitHub" title="GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.19c0 4.5 2.87 8.32 6.84 9.67.5.09.68-.22.68-.49v-1.71c-2.78.62-3.37-1.37-3.37-1.37-.45-1.17-1.11-1.48-1.11-1.48-.91-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.72 0 0 .84-.28 2.75 1.05A9.38 9.38 0 0 1 12 6.84c.85 0 1.71.12 2.51.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.42.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.06.36.32.68.94.68 1.9v2.81c0 .27.18.59.69.49C19.13 20.51 22 16.69 22 12.19 22 6.58 17.52 2 12 2z"/></svg>
+        </a>
+        <a href="#" class="tc-link" aria-label="LinkedIn" title="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.5h4V21H3zM9.5 9.5h3.8v1.6h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1V21h-4v-5.1c0-1.22-.02-2.78-1.7-2.78-1.7 0-1.96 1.33-1.96 2.7V21h-4z"/></svg>
+        </a>
+      </div>
+      <div class="tc-avatar">
+        <span style="line-height:1">${m.emoji}</span>
+        <div class="scan-v"></div>
+      </div>
+      <div class="tc-role-badge">${m.role}</div>
+      <div class="tc-name">${m.name}</div>
+      <div class="tc-title mono">${m.title}</div>
+      <div class="tc-tags">${m.tags.map(t=>`<span class="tc-tag">${t}</span>`).join("")}</div>
+      <div class="tc-stat-row">${m.stats.map(s=>`<div class="tc-stat"><div class="n">${s.n}</div><div class="l">${s.l}</div></div>`).join("")}</div>
+      <div class="tc-id">${m.id}</div>
+    </article>
+  `).join("");
+
+  // reveal on scroll
+  const cards = grid.querySelectorAll(".team-card");
+  cards.forEach((c,i)=>{
+    c.style.opacity="0";c.style.transform="translateY(40px)";
+    const io = new IntersectionObserver(([e])=>{
+      if(e.isIntersecting){
+        setTimeout(()=>{
+          c.style.transition="opacity .7s var(--ease),transform .7s var(--ease)";
+          c.style.opacity="1";c.style.transform="";
+        },i*90);
+        io.disconnect();
+      }
+    },{threshold:.12});
+    io.observe(c);
+  });
+}
+
 render();
 preHideHero();
 initFeed();
@@ -1755,6 +1974,7 @@ initCursor();
 initSpotlight();
 initForm();
 initRootTerm();
+initTeam();
 if (GSAP_OK) GL = initGL();
 if (!GL) initGlobe();
 initCaseViz();
